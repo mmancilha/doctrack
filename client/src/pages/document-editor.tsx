@@ -43,13 +43,15 @@ import { VersionHistory } from "@/components/version-history";
 import { VersionDiff } from "@/components/version-diff";
 import { EditorSkeleton } from "@/components/loading-skeleton";
 import { queryClient, apiRequest } from "@/lib/queryClient";
-import { DOCUMENT_CATEGORIES, DOCUMENT_STATUSES, DEFAULT_USER } from "@/lib/constants";
+import { DOCUMENT_CATEGORIES, DOCUMENT_STATUSES } from "@/lib/constants";
+import { useAuth } from "@/lib/auth";
 import type { Document, Version, InsertDocument } from "@shared/schema";
 
 export default function DocumentEditor() {
   const { id } = useParams<{ id: string }>();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const { user, canEdit, canDelete } = useAuth();
   const isNewDocument = !id || id === "new";
 
   const [title, setTitle] = useState("");
@@ -149,6 +151,11 @@ export default function DocumentEditor() {
       return;
     }
 
+    if (!canEdit) {
+      toast({ title: "Error", description: "You do not have permission to edit documents.", variant: "destructive" });
+      return;
+    }
+
     setIsSaving(true);
     try {
       if (isNewDocument) {
@@ -157,8 +164,8 @@ export default function DocumentEditor() {
           content,
           category,
           status,
-          authorId: DEFAULT_USER.id,
-          authorName: DEFAULT_USER.username,
+          authorId: user?.id || "",
+          authorName: user?.username || "",
         });
       } else {
         await updateDocument.mutateAsync({
@@ -171,7 +178,7 @@ export default function DocumentEditor() {
     } finally {
       setIsSaving(false);
     }
-  }, [title, content, category, status, isNewDocument, createDocument, updateDocument, toast]);
+  }, [title, content, category, status, isNewDocument, createDocument, updateDocument, toast, canEdit, user]);
 
   const handleSelectVersion = (version: Version) => {
     setContent(version.content);

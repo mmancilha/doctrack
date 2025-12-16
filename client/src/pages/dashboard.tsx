@@ -8,10 +8,12 @@ import { DocumentCard } from "@/components/document-card";
 import { EmptyState } from "@/components/empty-state";
 import { DashboardSkeleton, DocumentListSkeleton } from "@/components/loading-skeleton";
 import { queryClient, apiRequest } from "@/lib/queryClient";
+import { useAuth } from "@/lib/auth";
 import type { Document } from "@shared/schema";
 
 export default function Dashboard() {
   const [, setLocation] = useLocation();
+  const { canEdit, canDelete } = useAuth();
 
   const { data: documents, isLoading } = useQuery<Document[]>({
     queryKey: ["/api/documents"],
@@ -68,16 +70,18 @@ export default function Dashboard() {
             Welcome back! Here's an overview of your documentation.
           </motion.p>
         </div>
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.2 }}
-        >
-          <Button onClick={() => setLocation("/new")} data-testid="button-create-document">
-            <Plus className="mr-2 h-4 w-4" />
-            New Document
-          </Button>
-        </motion.div>
+        {canEdit && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2 }}
+          >
+            <Button onClick={() => setLocation("/new")} data-testid="button-create-document">
+              <Plus className="mr-2 h-4 w-4" />
+              New Document
+            </Button>
+          </motion.div>
+        )}
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -137,11 +141,11 @@ export default function Dashboard() {
           <EmptyState
             icon={FileText}
             title="No documents yet"
-            description="Create your first document to get started with DocTrack."
-            action={{
+            description={canEdit ? "Create your first document to get started with DocTrack." : "No documents are available yet."}
+            action={canEdit ? {
               label: "Create Document",
               onClick: () => setLocation("/new"),
-            }}
+            } : undefined}
           />
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -151,6 +155,7 @@ export default function Dashboard() {
                 document={doc}
                 index={index}
                 onDelete={(id) => deleteDocument.mutate(id)}
+                canDelete={canDelete}
               />
             ))}
           </div>

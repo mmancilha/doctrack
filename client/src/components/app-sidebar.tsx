@@ -4,7 +4,6 @@ import {
   FileText,
   Home,
   Plus,
-  Search,
   Settings,
   Clock,
   FolderOpen,
@@ -27,7 +26,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { DEFAULT_USER } from "@/lib/constants";
+import { useAuth } from "@/lib/auth";
 
 const mainNavItems = [
   { title: "Dashboard", url: "/", icon: Home },
@@ -43,6 +42,7 @@ const categoryItems = [
 
 export function AppSidebar() {
   const [location] = useLocation();
+  const { user, canEdit } = useAuth();
 
   return (
     <Sidebar>
@@ -64,19 +64,21 @@ export function AppSidebar() {
       </SidebarHeader>
 
       <SidebarContent className="px-2">
-        <SidebarGroup>
-          <div className="px-2 pb-2">
-            <Link href="/new">
-              <Button
-                className="w-full justify-start gap-2"
-                data-testid="button-new-document"
-              >
-                <Plus className="h-4 w-4" />
-                New Document
-              </Button>
-            </Link>
-          </div>
-        </SidebarGroup>
+        {canEdit && (
+          <SidebarGroup>
+            <div className="px-2 pb-2">
+              <Link href="/new">
+                <Button
+                  className="w-full justify-start gap-2"
+                  data-testid="button-new-document"
+                >
+                  <Plus className="h-4 w-4" />
+                  New Document
+                </Button>
+              </Link>
+            </div>
+          </SidebarGroup>
+        )}
 
         <SidebarGroup>
           <SidebarGroupLabel className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
@@ -135,20 +137,19 @@ export function AppSidebar() {
       </SidebarContent>
 
       <SidebarFooter className="p-4 border-t border-sidebar-border">
-        <div className="flex items-center gap-3">
-          <Avatar className="h-9 w-9">
-            <AvatarFallback className="bg-primary/10 text-primary text-sm font-medium">
-              {DEFAULT_USER.username.charAt(0).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex flex-col flex-1 min-w-0">
-            <span className="text-sm font-medium truncate">{DEFAULT_USER.username}</span>
-            <span className="text-xs text-muted-foreground capitalize">{DEFAULT_USER.role}</span>
+        {user && (
+          <div className="flex items-center gap-3">
+            <Avatar className="h-9 w-9">
+              <AvatarFallback className="bg-primary/10 text-primary text-sm font-medium">
+                {user.username.charAt(0).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex flex-col flex-1 min-w-0">
+              <span className="text-sm font-medium truncate">{user.username}</span>
+              <span className="text-xs text-muted-foreground capitalize">{user.role}</span>
+            </div>
           </div>
-          <Button variant="ghost" size="icon" data-testid="button-settings">
-            <Settings className="h-4 w-4" />
-          </Button>
-        </div>
+        )}
       </SidebarFooter>
     </Sidebar>
   );

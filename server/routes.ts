@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import { insertDocumentSchema, searchQuerySchema } from "@shared/schema";
 import { z } from "zod";
 import jsPDF from "jspdf";
+import { requireAuth, canEditDocuments, canDeleteDocuments } from "./auth";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -45,15 +46,20 @@ export async function registerRoutes(
     }
   });
 
-  app.post("/api/documents", async (req, res) => {
+  app.post("/api/documents", canEditDocuments, async (req, res) => {
     try {
-      const validatedData = insertDocumentSchema.parse(req.body);
+      const user = req.user!;
+      const validatedData = insertDocumentSchema.parse({
+        ...req.body,
+        authorId: user.id,
+        authorName: user.username,
+      });
       const document = await storage.createDocument(validatedData);
       
       await storage.createAuditLog({
         documentId: document.id,
-        userId: validatedData.authorId,
-        userName: validatedData.authorName,
+        userId: user.id,
+        userName: user.username,
         action: "created",
         details: `Created document: ${document.title}`,
       });
@@ -68,23 +74,28 @@ export async function registerRoutes(
     }
   });
 
-  app.patch("/api/documents/:id", async (req, res) => {
+  app.patch("/api/documents/:id", canEditDocuments, async (req, res) => {
     try {
+      const user = req.user!;
       const existingDoc = await storage.getDocument(req.params.id);
       if (!existingDoc) {
         return res.status(404).json({ error: "Document not found" });
       }
 
       const partialSchema = insertDocumentSchema.partial();
-      const validatedData = partialSchema.parse(req.body);
+      const validatedData = partialSchema.parse({
+        ...req.body,
+        authorId: user.id,
+        authorName: user.username,
+      });
       
       const document = await storage.updateDocument(req.params.id, validatedData);
 
       if (document) {
         await storage.createAuditLog({
           documentId: document.id,
-          userId: existingDoc.authorId,
-          userName: existingDoc.authorName,
+          userId: user.id,
+          userName: user.username,
           action: "updated",
           details: `Updated document: ${document.title}`,
         });
@@ -100,8 +111,9 @@ export async function registerRoutes(
     }
   });
 
-  app.delete("/api/documents/:id", async (req, res) => {
+  app.delete("/api/documents/:id", canDeleteDocuments, async (req, res) => {
     try {
+      const user = req.user!;
       const document = await storage.getDocument(req.params.id);
       if (!document) {
         return res.status(404).json({ error: "Document not found" });
@@ -109,8 +121,8 @@ export async function registerRoutes(
 
       await storage.createAuditLog({
         documentId: document.id,
-        userId: document.authorId,
-        userName: document.authorName,
+        userId: user.id,
+        userName: user.username,
         action: "deleted",
         details: `Deleted document: ${document.title}`,
       });

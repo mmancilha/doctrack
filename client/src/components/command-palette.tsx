@@ -22,6 +22,7 @@ import {
   CheckSquare,
   FileCheck,
 } from "lucide-react";
+import { useAuth } from "@/lib/auth";
 import type { Document } from "@shared/schema";
 
 interface CommandPaletteProps {
@@ -31,6 +32,7 @@ interface CommandPaletteProps {
 export function CommandPalette({ documents }: CommandPaletteProps) {
   const [open, setOpen] = useState(false);
   const [, setLocation] = useLocation();
+  const { canEdit } = useAuth();
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -81,18 +83,21 @@ export function CommandPalette({ documents }: CommandPaletteProps) {
             </div>
           </CommandEmpty>
 
-          <CommandGroup heading="Quick Actions">
-            <CommandItem
-              onSelect={() => runCommand(() => setLocation("/new"))}
-              data-testid="command-new-document"
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              <span>New Document</span>
-              <span className="ml-auto text-xs text-muted-foreground">Create</span>
-            </CommandItem>
-          </CommandGroup>
-
-          <CommandSeparator />
+          {canEdit && (
+            <>
+              <CommandGroup heading="Quick Actions">
+                <CommandItem
+                  onSelect={() => runCommand(() => setLocation("/new"))}
+                  data-testid="command-new-document"
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  <span>New Document</span>
+                  <span className="ml-auto text-xs text-muted-foreground">Create</span>
+                </CommandItem>
+              </CommandGroup>
+              <CommandSeparator />
+            </>
+          )}
 
           <CommandGroup heading="Navigation">
             <CommandItem

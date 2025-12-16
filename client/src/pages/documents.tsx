@@ -18,10 +18,12 @@ import { DocumentListSkeleton } from "@/components/loading-skeleton";
 import { Badge } from "@/components/ui/badge";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { DOCUMENT_CATEGORIES, DOCUMENT_STATUSES } from "@/lib/constants";
+import { useAuth } from "@/lib/auth";
 import type { Document } from "@shared/schema";
 
 export default function Documents() {
   const [, setLocation] = useLocation();
+  const { canEdit, canDelete } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -87,16 +89,18 @@ export default function Documents() {
             Browse and manage all your documentation
           </motion.p>
         </div>
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.2 }}
-        >
-          <Button onClick={() => setLocation("/new")} data-testid="button-create-document">
-            <Plus className="mr-2 h-4 w-4" />
-            New Document
-          </Button>
-        </motion.div>
+        {canEdit && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2 }}
+          >
+            <Button onClick={() => setLocation("/new")} data-testid="button-create-document">
+              <Plus className="mr-2 h-4 w-4" />
+              New Document
+            </Button>
+          </motion.div>
+        )}
       </div>
 
       <motion.div
@@ -189,12 +193,12 @@ export default function Documents() {
           description={
             hasActiveFilters
               ? "Try adjusting your filters or search query."
-              : "Create your first document to get started."
+              : canEdit ? "Create your first document to get started." : "No documents are available yet."
           }
           action={
             hasActiveFilters
               ? { label: "Clear Filters", onClick: clearFilters }
-              : { label: "Create Document", onClick: () => setLocation("/new") }
+              : canEdit ? { label: "Create Document", onClick: () => setLocation("/new") } : undefined
           }
         />
       ) : (
@@ -211,6 +215,7 @@ export default function Documents() {
                 document={doc}
                 index={index}
                 onDelete={(id) => deleteDocument.mutate(id)}
+                canDelete={canDelete}
               />
             ))}
           </div>

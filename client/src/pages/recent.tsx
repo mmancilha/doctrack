@@ -7,10 +7,12 @@ import { DocumentCard } from "@/components/document-card";
 import { EmptyState } from "@/components/empty-state";
 import { DocumentListSkeleton } from "@/components/loading-skeleton";
 import { queryClient, apiRequest } from "@/lib/queryClient";
+import { useAuth } from "@/lib/auth";
 import type { Document } from "@shared/schema";
 
 export default function Recent() {
   const [, setLocation] = useLocation();
+  const { canEdit, canDelete } = useAuth();
 
   const { data: documents, isLoading } = useQuery<Document[]>({
     queryKey: ["/api/documents"],
@@ -66,27 +68,29 @@ export default function Recent() {
             </motion.p>
           </div>
         </div>
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.2 }}
-        >
-          <Button onClick={() => setLocation("/new")} data-testid="button-create-document">
-            <Plus className="mr-2 h-4 w-4" />
-            New Document
-          </Button>
-        </motion.div>
+        {canEdit && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2 }}
+          >
+            <Button onClick={() => setLocation("/new")} data-testid="button-create-document">
+              <Plus className="mr-2 h-4 w-4" />
+              New Document
+            </Button>
+          </motion.div>
+        )}
       </div>
 
       {recentDocuments.length === 0 ? (
         <EmptyState
           icon={Clock}
           title="No recent documents"
-          description="Documents you edit will appear here."
-          action={{
+          description={canEdit ? "Documents you edit will appear here." : "Recently viewed documents will appear here."}
+          action={canEdit ? {
             label: "Create Document",
             onClick: () => setLocation("/new"),
-          }}
+          } : undefined}
         />
       ) : (
         <>
@@ -101,6 +105,7 @@ export default function Recent() {
                 document={doc}
                 index={index}
                 onDelete={(id) => deleteDocument.mutate(id)}
+                canDelete={canDelete}
               />
             ))}
           </div>

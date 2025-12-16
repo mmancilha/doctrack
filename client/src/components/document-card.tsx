@@ -17,6 +17,7 @@ interface DocumentCardProps {
   document: Document;
   onDelete?: (id: string) => void;
   index?: number;
+  canDelete?: boolean;
 }
 
 const categoryIcons = {
@@ -31,7 +32,7 @@ const statusColors = {
   archived: "bg-gray-100 text-gray-800 dark:bg-gray-800/50 dark:text-gray-400",
 };
 
-export function DocumentCard({ document, onDelete, index = 0 }: DocumentCardProps) {
+export function DocumentCard({ document, onDelete, index = 0, canDelete = false }: DocumentCardProps) {
   const Icon = categoryIcons[document.category as keyof typeof categoryIcons] || FileText;
   const statusColor = statusColors[document.status as keyof typeof statusColors] || statusColors.draft;
 
@@ -70,30 +71,32 @@ export function DocumentCard({ document, onDelete, index = 0 }: DocumentCardProp
               >
                 {document.status}
               </Badge>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild onClick={(e) => e.preventDefault()}>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
-                    data-testid={`button-menu-${document.id}`}
-                  >
-                    <MoreVertical className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
-                  <DropdownMenuItem
-                    onClick={(e) => {
-                      e.preventDefault();
-                      onDelete?.(document.id);
-                    }}
-                    className="text-destructive"
-                    data-testid={`button-delete-${document.id}`}
-                  >
-                    Delete
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              {canDelete && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild onClick={(e) => e.preventDefault()}>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                      data-testid={`button-menu-${document.id}`}
+                    >
+                      <MoreVertical className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
+                    <DropdownMenuItem
+                      onClick={(e) => {
+                        e.preventDefault();
+                        onDelete?.(document.id);
+                      }}
+                      className="text-destructive"
+                      data-testid={`button-delete-${document.id}`}
+                    >
+                      Delete
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
             </div>
           </CardHeader>
           <CardContent className="pb-4">

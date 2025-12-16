@@ -7,6 +7,7 @@ import { DocumentCard } from "@/components/document-card";
 import { EmptyState } from "@/components/empty-state";
 import { DocumentListSkeleton } from "@/components/loading-skeleton";
 import { queryClient, apiRequest } from "@/lib/queryClient";
+import { useAuth } from "@/lib/auth";
 import type { Document, DocumentCategory } from "@shared/schema";
 
 const categoryConfig: Record<
@@ -33,6 +34,7 @@ const categoryConfig: Record<
 export default function Category() {
   const { category } = useParams<{ category: string }>();
   const [, setLocation] = useLocation();
+  const { canEdit, canDelete } = useAuth();
 
   const config = categoryConfig[category || ""] || {
     title: "Documents",
@@ -94,27 +96,29 @@ export default function Category() {
             </motion.p>
           </div>
         </div>
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.2 }}
-        >
-          <Button onClick={() => setLocation("/new")} data-testid="button-create-document">
-            <Plus className="mr-2 h-4 w-4" />
-            New {config.title.slice(0, -1)}
-          </Button>
-        </motion.div>
+        {canEdit && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2 }}
+          >
+            <Button onClick={() => setLocation("/new")} data-testid="button-create-document">
+              <Plus className="mr-2 h-4 w-4" />
+              New {config.title.slice(0, -1)}
+            </Button>
+          </motion.div>
+        )}
       </div>
 
       {filteredDocuments.length === 0 ? (
         <EmptyState
           icon={Icon}
           title={`No ${config.title.toLowerCase()} yet`}
-          description={`Create your first ${config.title.toLowerCase().slice(0, -1)} to get started.`}
-          action={{
+          description={canEdit ? `Create your first ${config.title.toLowerCase().slice(0, -1)} to get started.` : `No ${config.title.toLowerCase()} are available yet.`}
+          action={canEdit ? {
             label: `Create ${config.title.slice(0, -1)}`,
             onClick: () => setLocation("/new"),
-          }}
+          } : undefined}
         />
       ) : (
         <>
@@ -128,6 +132,7 @@ export default function Category() {
                 document={doc}
                 index={index}
                 onDelete={(id) => deleteDocument.mutate(id)}
+                canDelete={canDelete}
               />
             ))}
           </div>
