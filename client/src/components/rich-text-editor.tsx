@@ -1,13 +1,13 @@
-import { useEditor, EditorContent, BubbleMenu } from "@tiptap/react";
+import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import Underline from "@tiptap/extension-underline";
-import Link from "@tiptap/extension-link";
-import Image from "@tiptap/extension-image";
-import Table from "@tiptap/extension-table";
-import TableRow from "@tiptap/extension-table-row";
-import TableCell from "@tiptap/extension-table-cell";
-import TableHeader from "@tiptap/extension-table-header";
-import Placeholder from "@tiptap/extension-placeholder";
+import { Underline } from "@tiptap/extension-underline";
+import { Link } from "@tiptap/extension-link";
+import { Image } from "@tiptap/extension-image";
+import { Table } from "@tiptap/extension-table";
+import { TableRow } from "@tiptap/extension-table-row";
+import { TableCell } from "@tiptap/extension-table-cell";
+import { TableHeader } from "@tiptap/extension-table-header";
+import { Placeholder } from "@tiptap/extension-placeholder";
 import { useCallback, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
@@ -286,39 +286,6 @@ export function RichTextEditor({
             />
           </div>
         </div>
-      )}
-
-      {editor && editable && (
-        <BubbleMenu
-          editor={editor}
-          tippyOptions={{ duration: 100 }}
-          className="flex items-center gap-0.5 p-1 bg-popover border rounded-lg shadow-lg"
-        >
-          <ToolbarButton
-            icon={Bold}
-            onClick={() => editor.chain().focus().toggleBold().run()}
-            isActive={editor.isActive("bold")}
-            size="sm"
-          />
-          <ToolbarButton
-            icon={Italic}
-            onClick={() => editor.chain().focus().toggleItalic().run()}
-            isActive={editor.isActive("italic")}
-            size="sm"
-          />
-          <ToolbarButton
-            icon={UnderlineIcon}
-            onClick={() => editor.chain().focus().toggleUnderline().run()}
-            isActive={editor.isActive("underline")}
-            size="sm"
-          />
-          <ToolbarButton
-            icon={LinkIcon}
-            onClick={addLink}
-            isActive={editor.isActive("link")}
-            size="sm"
-          />
-        </BubbleMenu>
       )}
 
       <EditorContent editor={editor} data-testid="editor-content" />

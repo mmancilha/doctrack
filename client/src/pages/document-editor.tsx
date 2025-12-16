@@ -50,7 +50,7 @@ export default function DocumentEditor() {
   const { id } = useParams<{ id: string }>();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const isNewDocument = id === "new";
+  const isNewDocument = !id || id === "new";
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
