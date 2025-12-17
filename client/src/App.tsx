@@ -17,6 +17,7 @@ import Category from "@/pages/category";
 import Recent from "@/pages/recent";
 import Login from "@/pages/login";
 import AuditLogs from "@/pages/audit-logs";
+import UsersPage from "@/pages/users";
 import type { Document } from "@shared/schema";
 
 function Router() {
@@ -29,6 +30,7 @@ function Router() {
       <Route path="/category/:category" component={Category} />
       <Route path="/recent" component={Recent} />
       <Route path="/audit-logs" component={AuditLogs} />
+      <Route path="/users" component={UsersPage} />
       <Route component={NotFound} />
     </Switch>
   );

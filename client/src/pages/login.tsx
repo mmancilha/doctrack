@@ -112,26 +112,6 @@ export default function Login() {
                 {isPending ? "Signing in..." : "Sign in"}
               </Button>
             </form>
-
-            <div className="mt-6 pt-4 border-t">
-              <p className="text-xs text-muted-foreground text-center mb-3">
-                Demo accounts:
-              </p>
-              <div className="grid grid-cols-3 gap-2 text-xs">
-                <div className="p-2 rounded-md bg-muted text-center">
-                  <p className="font-medium">Admin</p>
-                  <p className="text-muted-foreground">admin / admin123</p>
-                </div>
-                <div className="p-2 rounded-md bg-muted text-center">
-                  <p className="font-medium">Editor</p>
-                  <p className="text-muted-foreground">editor / editor123</p>
-                </div>
-                <div className="p-2 rounded-md bg-muted text-center">
-                  <p className="font-medium">Reader</p>
-                  <p className="text-muted-foreground">reader / reader123</p>
-                </div>
-              </div>
-            </div>
           </CardContent>
         </Card>
       </motion.div>

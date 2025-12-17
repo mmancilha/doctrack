@@ -10,6 +10,8 @@ import {
   BookOpen,
   CheckSquare,
   FileCheck,
+  UserCog,
+  ScrollText,
 } from "lucide-react";
 import {
   Sidebar,
@@ -134,6 +136,42 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {user?.role === "admin" && (
+          <SidebarGroup>
+            <SidebarGroupLabel className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              Admin
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={location === "/users"}
+                    data-testid="nav-users"
+                  >
+                    <Link href="/users">
+                      <UserCog className="h-4 w-4" />
+                      <span>User Management</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={location === "/audit-logs"}
+                    data-testid="nav-audit-logs"
+                  >
+                    <Link href="/audit-logs">
+                      <ScrollText className="h-4 w-4" />
+                      <span>Audit Logs</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
       </SidebarContent>
 
       <SidebarFooter className="p-4 border-t border-sidebar-border">

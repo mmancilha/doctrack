@@ -170,6 +170,55 @@ export function setupAuth(app: Express) {
       res.status(500).json({ error: "Failed to create user" });
     }
   });
+
+  app.patch("/api/users/:id", requireAuth, requireRole(["admin"]), async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { role, password } = req.body;
+
+      const updates: any = {};
+      if (role && ["reader", "editor", "admin"].includes(role)) {
+        updates.role = role;
+      }
+      if (password) {
+        updates.password = await bcrypt.hash(password, 10);
+      }
+
+      if (Object.keys(updates).length === 0) {
+        return res.status(400).json({ error: "No valid updates provided" });
+      }
+
+      const user = await storage.updateUser(id, updates);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      res.json({
+        id: user.id,
+        username: user.username,
+        role: user.role,
+        avatarUrl: user.avatarUrl,
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update user" });
+    }
+  });
+
+  app.delete("/api/users/:id", requireAuth, requireRole(["admin"]), async (req, res) => {
+    try {
+      const { id } = req.params;
+
+      // Prevent admin from deleting themselves
+      if (req.user!.id === id) {
+        return res.status(400).json({ error: "Cannot delete your own account" });
+      }
+
+      await storage.deleteUser(id);
+      res.json({ message: "User deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete user" });
+    }
+  });
 }
 
 export const requireAuth: RequestHandler = (req, res, next) => {
