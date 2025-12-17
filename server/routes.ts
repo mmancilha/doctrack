@@ -174,6 +174,23 @@ export async function registerRoutes(
         return res.status(404).json({ error: "Document not found" });
       }
 
+      const { versionId } = req.body as { versionId?: string };
+      let contentToExport = document.content;
+      let versionLabel = "Current";
+      let authorName = document.authorName;
+      let updatedAt = document.updatedAt;
+
+      if (versionId) {
+        const version = await storage.getVersion(versionId);
+        if (!version) {
+          return res.status(404).json({ error: "Version not found" });
+        }
+        contentToExport = version.content;
+        versionLabel = `v${version.versionNumber}`;
+        authorName = version.authorName;
+        updatedAt = version.createdAt;
+      }
+
       const pdf = new jsPDF({
         orientation: "portrait",
         unit: "mm",
@@ -198,9 +215,9 @@ export async function registerRoutes(
 
       pdf.setFontSize(10);
       pdf.setTextColor(100);
-      pdf.text(`Category: ${document.category} | Status: ${document.status}`, margin, 45);
-      pdf.text(`Author: ${document.authorName}`, margin, 52);
-      pdf.text(`Last updated: ${new Date(document.updatedAt).toLocaleDateString()}`, margin, 59);
+      pdf.text(`Category: ${document.category} | Status: ${document.status} | Version: ${versionLabel}`, margin, 45);
+      pdf.text(`Author: ${authorName}`, margin, 52);
+      pdf.text(`Date: ${new Date(updatedAt).toLocaleDateString()}`, margin, 59);
 
       pdf.line(margin, 65, pageWidth - margin, 65);
 
@@ -226,7 +243,7 @@ export async function registerRoutes(
           .trim();
       };
 
-      const plainText = stripHtml(document.content);
+      const plainText = stripHtml(contentToExport);
       pdf.setFontSize(11);
       pdf.setTextColor(30);
 
@@ -270,6 +287,76 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error fetching comments:", error);
       res.status(500).json({ error: "Failed to fetch comments" });
+    }
+  });
+
+  const commentSchema = z.object({
+    content: z.string().min(1, "Comment content is required"),
+    sectionId: z.string().nullable().optional(),
+    sectionText: z.string().nullable().optional(),
+  });
+
+  app.post("/api/documents/:id/comments", requireAuth, async (req, res) => {
+    try {
+      const document = await storage.getDocument(req.params.id);
+      if (!document) {
+        return res.status(404).json({ error: "Document not found" });
+      }
+
+      const validationResult = commentSchema.safeParse(req.body);
+      if (!validationResult.success) {
+        return res.status(400).json({ error: "Invalid comment data", details: validationResult.error.errors });
+      }
+
+      const { content, sectionId, sectionText } = validationResult.data;
+      const user = req.user!;
+      const comment = await storage.createComment({
+        documentId: req.params.id,
+        authorId: user.id,
+        authorName: user.username,
+        content,
+        sectionId: sectionId || null,
+        sectionText: sectionText || null,
+        resolved: "false",
+      });
+
+      await storage.createAuditLog({
+        documentId: req.params.id,
+        userId: user.id,
+        userName: user.username,
+        action: "commented",
+        details: `Added comment on document: ${document.title}`,
+      });
+
+      res.status(201).json(comment);
+    } catch (error) {
+      console.error("Error creating comment:", error);
+      res.status(500).json({ error: "Failed to create comment" });
+    }
+  });
+
+  const resolveCommentSchema = z.object({
+    resolved: z.enum(["true", "false"]),
+  });
+
+  app.patch("/api/comments/:id", canEditDocuments, async (req, res) => {
+    try {
+      const validationResult = resolveCommentSchema.safeParse(req.body);
+      if (!validationResult.success) {
+        return res.status(400).json({ error: "Invalid data", details: validationResult.error.errors });
+      }
+
+      const { resolved } = validationResult.data;
+      const comment = await storage.updateComment(req.params.id, { resolved });
+      
+      if (!comment) {
+        return res.status(404).json({ error: "Comment not found" });
+      }
+
+      res.json(comment);
+    } catch (error) {
+      console.error("Error updating comment:", error);
+      res.status(500).json({ error: "Failed to update comment" });
     }
   });
 

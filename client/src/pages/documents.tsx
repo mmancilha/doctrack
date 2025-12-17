@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
-import { FileText, Plus, Search, Filter, Grid, List, X } from "lucide-react";
+import { FileText, Plus, Search, Filter, Grid, List, X, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -21,12 +21,20 @@ import { DOCUMENT_CATEGORIES, DOCUMENT_STATUSES } from "@/lib/constants";
 import { useAuth } from "@/lib/auth";
 import type { Document } from "@shared/schema";
 
+const DATE_FILTERS = [
+  { value: "all", label: "All time" },
+  { value: "7days", label: "Last 7 days" },
+  { value: "30days", label: "Last 30 days" },
+  { value: "90days", label: "Last 90 days" },
+];
+
 export default function Documents() {
   const [, setLocation] = useLocation();
   const { canEdit, canDelete } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [dateFilter, setDateFilter] = useState<string>("all");
 
   const { data: documents, isLoading } = useQuery<Document[]>({
     queryKey: ["/api/documents"],
@@ -41,6 +49,29 @@ export default function Documents() {
     },
   });
 
+  const getDateFilterRange = (filter: string): Date | null => {
+    const now = new Date();
+    switch (filter) {
+      case "7days": {
+        const daysAgo = new Date(now);
+        daysAgo.setDate(daysAgo.getDate() - 7);
+        return daysAgo;
+      }
+      case "30days": {
+        const daysAgo = new Date(now);
+        daysAgo.setDate(daysAgo.getDate() - 30);
+        return daysAgo;
+      }
+      case "90days": {
+        const daysAgo = new Date(now);
+        daysAgo.setDate(daysAgo.getDate() - 90);
+        return daysAgo;
+      }
+      default:
+        return null;
+    }
+  };
+
   const filteredDocuments = (documents || []).filter((doc) => {
     const matchesSearch =
       doc.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -49,16 +80,20 @@ export default function Documents() {
 
     const matchesCategory = categoryFilter === "all" || doc.category === categoryFilter;
     const matchesStatus = statusFilter === "all" || doc.status === statusFilter;
+    
+    const dateThreshold = getDateFilterRange(dateFilter);
+    const matchesDate = !dateThreshold || new Date(doc.updatedAt) >= dateThreshold;
 
-    return matchesSearch && matchesCategory && matchesStatus;
+    return matchesSearch && matchesCategory && matchesStatus && matchesDate;
   });
 
-  const hasActiveFilters = categoryFilter !== "all" || statusFilter !== "all" || searchQuery !== "";
+  const hasActiveFilters = categoryFilter !== "all" || statusFilter !== "all" || dateFilter !== "all" || searchQuery !== "";
 
   const clearFilters = () => {
     setSearchQuery("");
     setCategoryFilter("all");
     setStatusFilter("all");
+    setDateFilter("all");
   };
 
   if (isLoading) {
@@ -146,6 +181,19 @@ export default function Documents() {
               ))}
             </SelectContent>
           </Select>
+          <Select value={dateFilter} onValueChange={setDateFilter}>
+            <SelectTrigger className="w-[130px]" data-testid="select-date">
+              <Calendar className="h-4 w-4 mr-2" />
+              <SelectValue placeholder="Date" />
+            </SelectTrigger>
+            <SelectContent>
+              {DATE_FILTERS.map((filter) => (
+                <SelectItem key={filter.value} value={filter.value}>
+                  {filter.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </motion.div>
 
@@ -176,6 +224,14 @@ export default function Documents() {
             <Badge variant="secondary" className="gap-1">
               Status: {statusFilter}
               <button onClick={() => setStatusFilter("all")}>
+                <X className="h-3 w-3" />
+              </button>
+            </Badge>
+          )}
+          {dateFilter !== "all" && (
+            <Badge variant="secondary" className="gap-1">
+              Date: {DATE_FILTERS.find(f => f.value === dateFilter)?.label}
+              <button onClick={() => setDateFilter("all")}>
                 <X className="h-3 w-3" />
               </button>
             </Badge>

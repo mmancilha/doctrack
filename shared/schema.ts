@@ -70,6 +70,9 @@ export const comments = pgTable("comments", {
   authorId: varchar("author_id").notNull(),
   authorName: text("author_name").notNull(),
   content: text("content").notNull(),
+  sectionId: text("section_id"),
+  sectionText: text("section_text"),
+  resolved: text("resolved").default("false"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

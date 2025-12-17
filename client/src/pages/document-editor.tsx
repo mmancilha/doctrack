@@ -12,6 +12,7 @@ import {
   MoreVertical,
   Trash2,
   Eye,
+  MessageSquare,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -42,6 +43,7 @@ import { RichTextEditor } from "@/components/rich-text-editor";
 import { VersionHistory } from "@/components/version-history";
 import { VersionDiff } from "@/components/version-diff";
 import { EditorSkeleton } from "@/components/loading-skeleton";
+import { SectionComments } from "@/components/section-comments";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { DOCUMENT_CATEGORIES, DOCUMENT_STATUSES } from "@/lib/constants";
 import { useAuth } from "@/lib/auth";
@@ -60,6 +62,7 @@ export default function DocumentEditor() {
   const [status, setStatus] = useState<string>("draft");
   const [isSaving, setIsSaving] = useState(false);
   const [showVersionHistory, setShowVersionHistory] = useState(false);
+  const [showComments, setShowComments] = useState(false);
   const [isComparing, setIsComparing] = useState(false);
   const [diffVersions, setDiffVersions] = useState<{ v1: Version; v2: Version } | null>(null);
 
@@ -125,13 +128,13 @@ export default function DocumentEditor() {
   });
 
   const exportPdf = useMutation({
-    mutationFn: async () => {
-      const response = await apiRequest("POST", `/api/documents/${id}/export-pdf`);
+    mutationFn: async (versionId?: string) => {
+      const response = await apiRequest("POST", `/api/documents/${id}/export-pdf`, { versionId });
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = window.document.createElement("a");
       a.href = url;
-      a.download = `${title || "document"}.pdf`;
+      a.download = `${title || "document"}${versionId ? `_v${versions.find(v => v.id === versionId)?.versionNumber || ''}` : ''}.pdf`;
       window.document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
@@ -276,16 +279,62 @@ export default function DocumentEditor() {
                 Compare
               </Button>
 
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => exportPdf.mutate()}
-                disabled={exportPdf.isPending}
-                data-testid="button-export-pdf"
-              >
-                <Download className="mr-2 h-4 w-4" />
-                Export PDF
-              </Button>
+              <Sheet open={showComments} onOpenChange={setShowComments}>
+                <SheetTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    data-testid="button-comments"
+                  >
+                    <MessageSquare className="mr-2 h-4 w-4" />
+                    Comments
+                  </Button>
+                </SheetTrigger>
+                <SheetContent className="w-[400px] sm:w-[450px] p-0">
+                  <SectionComments
+                    documentId={id!}
+                    onClose={() => setShowComments(false)}
+                  />
+                </SheetContent>
+              </Sheet>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={exportPdf.isPending}
+                    data-testid="button-export-pdf"
+                  >
+                    <Download className="mr-2 h-4 w-4" />
+                    Export PDF
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem
+                    onClick={() => exportPdf.mutate(undefined)}
+                    data-testid="button-export-current"
+                  >
+                    <Download className="mr-2 h-4 w-4" />
+                    Export Current Version
+                  </DropdownMenuItem>
+                  {versions.length > 0 && (
+                    <>
+                      <DropdownMenuSeparator />
+                      {versions.slice(0, 5).map((v) => (
+                        <DropdownMenuItem
+                          key={v.id}
+                          onClick={() => exportPdf.mutate(v.id)}
+                          data-testid={`button-export-version-${v.id}`}
+                        >
+                          <Clock className="mr-2 h-4 w-4" />
+                          Export v{v.versionNumber}
+                        </DropdownMenuItem>
+                      ))}
+                    </>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </>
           )}
 
@@ -306,7 +355,7 @@ export default function DocumentEditor() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => exportPdf.mutate()}>
+                <DropdownMenuItem onClick={() => exportPdf.mutate(undefined)}>
                   <Download className="mr-2 h-4 w-4" />
                   Export as PDF
                 </DropdownMenuItem>
