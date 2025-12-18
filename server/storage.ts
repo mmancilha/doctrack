@@ -27,12 +27,12 @@ export interface IStorage {
   deleteUser(id: string): Promise<boolean>;
   getUsers(): Promise<User[]>;
 
-  getDocuments(): Promise<Document[]>;
-  getDocument(id: string): Promise<Document | undefined>;
+  getDocuments(user?: User): Promise<Document[]>;
+  getDocument(id: string, user?: User): Promise<Document | undefined>;
   createDocument(doc: InsertDocument): Promise<Document>;
   updateDocument(id: string, doc: Partial<InsertDocument>): Promise<Document | undefined>;
   deleteDocument(id: string): Promise<boolean>;
-  searchDocuments(query: SearchQuery): Promise<Document[]>;
+  searchDocuments(query: SearchQuery, user?: User): Promise<Document[]>;
 
   getVersions(documentId: string): Promise<Version[]>;
   getVersion(id: string): Promise<Version | undefined>;
@@ -81,13 +81,47 @@ export class DatabaseStorage implements IStorage {
     return true;
   }
 
-  async getDocuments(): Promise<Document[]> {
-    return await db.select().from(documents).orderBy(desc(documents.updatedAt));
+  async getDocuments(user?: User): Promise<Document[]> {
+    // Sem usuário ou admin: vê todos os documentos
+    if (!user || user.role === "admin") {
+      return await db.select().from(documents).orderBy(desc(documents.updatedAt));
+    }
+    
+    // Outros usuários: seus documentos + documentos publicados
+    return await db
+      .select()
+      .from(documents)
+      .where(
+        or(
+          eq(documents.authorId, user.id),      // Seus próprios documentos
+          eq(documents.status, "published")     // Documentos publicados por outros
+        )
+      )
+      .orderBy(desc(documents.updatedAt));
   }
 
-  async getDocument(id: string): Promise<Document | undefined> {
+  async getDocument(id: string, user?: User): Promise<Document | undefined> {
     const [doc] = await db.select().from(documents).where(eq(documents.id, id));
-    return doc;
+    
+    if (!doc) return undefined;
+    
+    // Sem usuário ou admin: pode ver qualquer documento
+    if (!user || user.role === "admin") {
+      return doc;
+    }
+    
+    // Usuário é o autor: pode ver seu documento
+    if (doc.authorId === user.id) {
+      return doc;
+    }
+    
+    // Documento publicado: qualquer um pode ver
+    if (doc.status === "published") {
+      return doc;
+    }
+    
+    // Não tem permissão
+    return undefined;
   }
 
   async createDocument(insertDoc: InsertDocument): Promise<Document> {
@@ -146,8 +180,18 @@ export class DatabaseStorage implements IStorage {
     return result.length > 0;
   }
 
-  async searchDocuments(query: SearchQuery): Promise<Document[]> {
+  async searchDocuments(query: SearchQuery, user?: User): Promise<Document[]> {
     const conditions: any[] = [];
+
+    // Filtro de visibilidade baseado no usuário
+    if (user && user.role !== "admin") {
+      conditions.push(
+        or(
+          eq(documents.authorId, user.id),      // Seus próprios documentos
+          eq(documents.status, "published")     // Documentos publicados por outros
+        )
+      );
+    }
 
     if (query.query) {
       const searchTerm = `%${query.query}%`;

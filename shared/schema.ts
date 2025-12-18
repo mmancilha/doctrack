@@ -8,6 +8,7 @@ export const users = pgTable("users", {
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
   role: text("role").notNull().default("editor"),
+  displayName: text("display_name"),
   avatarUrl: text("avatar_url"),
 });
 
@@ -15,10 +16,17 @@ export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
   role: true,
+  displayName: true,
   avatarUrl: true,
 });
 
+export const updateProfileSchema = z.object({
+  displayName: z.string().min(1).max(100).optional(),
+  avatarUrl: z.string().url().optional().nullable(),
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
+export type UpdateProfile = z.infer<typeof updateProfileSchema>;
 export type User = typeof users.$inferSelect;
 
 export type DocumentCategory = "manual" | "checklist" | "guide";
@@ -30,6 +38,7 @@ export const documents = pgTable("documents", {
   content: text("content").notNull().default(""),
   category: text("category").notNull().default("manual"),
   status: text("status").notNull().default("draft"),
+  company: text("company").notNull().default("Geral"),
   authorId: varchar("author_id").notNull(),
   authorName: text("author_name").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),

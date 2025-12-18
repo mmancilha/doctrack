@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation, useParams } from "wouter";
+import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Save,
@@ -13,9 +14,26 @@ import {
   Trash2,
   Eye,
   MessageSquare,
+  Check,
+  ChevronsUpDown,
+  Building2,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -38,6 +56,16 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { RichTextEditor } from "@/components/rich-text-editor";
 import { VersionHistory } from "@/components/version-history";
@@ -45,26 +73,48 @@ import { VersionDiff } from "@/components/version-diff";
 import { EditorSkeleton } from "@/components/loading-skeleton";
 import { SectionComments } from "@/components/section-comments";
 import { queryClient, apiRequest } from "@/lib/queryClient";
-import { DOCUMENT_CATEGORIES, DOCUMENT_STATUSES } from "@/lib/constants";
+import { useDocumentCategories, useDocumentStatuses } from "@/lib/constants";
 import { useAuth } from "@/lib/auth";
 import type { Document, Version, InsertDocument } from "@shared/schema";
 
 export default function DocumentEditor() {
+  const { t } = useTranslation("documents");
+  const { t: tCommon } = useTranslation("common");
   const { id } = useParams<{ id: string }>();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const { user, canEdit, canDelete } = useAuth();
   const isNewDocument = !id || id === "new";
+  
+  const documentCategories = useDocumentCategories();
+  const documentStatuses = useDocumentStatuses();
 
-  const [title, setTitle] = useState("");
+  const validCategories = ["manual", "checklist", "guide", "confidentiality", "proposal", "contract", "policy", "procedure"];
+
+  // Get category from URL query string for new documents
+  const getInitialCategory = () => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const urlCategory = params.get("category");
+      if (urlCategory && validCategories.includes(urlCategory)) {
+        return urlCategory;
+      }
+    }
+    return "manual";
+  };
+
   const [content, setContent] = useState("");
-  const [category, setCategory] = useState<string>("manual");
+  const [category, setCategory] = useState<string>(getInitialCategory);
   const [status, setStatus] = useState<string>("draft");
+  const [company, setCompany] = useState<string>("");
   const [isSaving, setIsSaving] = useState(false);
   const [showVersionHistory, setShowVersionHistory] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [isComparing, setIsComparing] = useState(false);
   const [diffVersions, setDiffVersions] = useState<{ v1: Version; v2: Version } | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [clientPopoverOpen, setClientPopoverOpen] = useState(false);
+  const [clientSearch, setClientSearch] = useState("");
 
   const { data: document, isLoading: isLoadingDocument } = useQuery<Document>({
     queryKey: ["/api/documents", id],
@@ -76,9 +126,17 @@ export default function DocumentEditor() {
     enabled: !isNewDocument && !!id,
   });
 
+  // Fetch all documents for client autocomplete
+  const { data: allDocuments = [] } = useQuery<Document[]>({
+    queryKey: ["/api/documents"],
+  });
+
+  // Extract unique client names for autocomplete
+  const existingClients = [...new Set(allDocuments.map((doc) => doc.company).filter(Boolean))].sort();
+
   useEffect(() => {
     if (document) {
-      setTitle(document.title);
+      setCompany(document.company || document.title || "");
       setContent(document.content);
       setCategory(document.category);
       setStatus(document.status);
@@ -92,11 +150,11 @@ export default function DocumentEditor() {
     },
     onSuccess: (newDoc) => {
       queryClient.invalidateQueries({ queryKey: ["/api/documents"] });
-      toast({ title: "Document created", description: "Your document has been saved." });
+      toast({ title: t("toast.created.title"), description: t("toast.created.description") });
       setLocation(`/document/${newDoc.id}`);
     },
     onError: () => {
-      toast({ title: "Error", description: "Failed to create document.", variant: "destructive" });
+      toast({ title: t("toast.error.title"), description: t("toast.error.create"), variant: "destructive" });
     },
   });
 
@@ -109,10 +167,10 @@ export default function DocumentEditor() {
       queryClient.invalidateQueries({ queryKey: ["/api/documents"] });
       queryClient.invalidateQueries({ queryKey: ["/api/documents", id] });
       queryClient.invalidateQueries({ queryKey: ["/api/documents", id, "versions"] });
-      toast({ title: "Document saved", description: "Your changes have been saved." });
+      toast({ title: t("toast.saved.title"), description: t("toast.saved.description") });
     },
     onError: () => {
-      toast({ title: "Error", description: "Failed to save document.", variant: "destructive" });
+      toast({ title: t("toast.error.title"), description: t("toast.error.save"), variant: "destructive" });
     },
   });
 
@@ -122,7 +180,7 @@ export default function DocumentEditor() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/documents"] });
-      toast({ title: "Document deleted", description: "The document has been removed." });
+      toast({ title: t("toast.deleted.title"), description: t("toast.deleted.description") });
       setLocation("/");
     },
   });
@@ -141,21 +199,21 @@ export default function DocumentEditor() {
       window.document.body.removeChild(a);
     },
     onSuccess: () => {
-      toast({ title: "PDF exported", description: "Your document has been downloaded." });
+      toast({ title: t("toast.exported.title"), description: t("toast.exported.description") });
     },
     onError: () => {
-      toast({ title: "Error", description: "Failed to export PDF.", variant: "destructive" });
+      toast({ title: t("toast.error.title"), description: t("toast.error.export"), variant: "destructive" });
     },
   });
 
   const handleSave = useCallback(async () => {
-    if (!title.trim()) {
-      toast({ title: "Error", description: "Please enter a document title.", variant: "destructive" });
+    if (!company.trim()) {
+      toast({ title: t("toast.error.title"), description: t("toast.error.noClient"), variant: "destructive" });
       return;
     }
 
     if (!canEdit) {
-      toast({ title: "Error", description: "You do not have permission to edit documents.", variant: "destructive" });
+      toast({ title: t("toast.error.title"), description: t("toast.error.noPermission"), variant: "destructive" });
       return;
     }
 
@@ -163,38 +221,41 @@ export default function DocumentEditor() {
     try {
       if (isNewDocument) {
         await createDocument.mutateAsync({
-          title,
+          title: company || "Sem título",
           content,
           category,
           status,
+          company: company || "Geral",
           authorId: user?.id || "",
           authorName: user?.username || "",
         });
       } else {
         await updateDocument.mutateAsync({
-          title,
+          title: company || "Sem título",
           content,
           category,
           status,
+          company: company || "Geral",
         });
       }
     } finally {
       setIsSaving(false);
     }
-  }, [title, content, category, status, isNewDocument, createDocument, updateDocument, toast, canEdit, user]);
+  }, [content, category, status, company, isNewDocument, createDocument, updateDocument, toast, canEdit, user, t]);
 
   const handleSelectVersion = (version: Version) => {
     setContent(version.content);
     setShowVersionHistory(false);
     toast({
-      title: "Version loaded",
-      description: `Loaded version ${version.versionNumber}. Save to keep changes.`,
+      title: t("toast.versionLoaded.title"),
+      description: t("toast.versionLoaded.description", { version: version.versionNumber }),
     });
   };
 
   const handleCompareVersions = (v1: Version, v2: Version) => {
     setDiffVersions({ v1, v2 });
     setIsComparing(false);
+    setShowVersionHistory(false); // Fecha o painel automaticamente
   };
 
   if (!isNewDocument && isLoadingDocument) {
@@ -205,7 +266,8 @@ export default function DocumentEditor() {
     );
   }
 
-  const statusColor = DOCUMENT_STATUSES.find((s) => s.value === status)?.color || "gray";
+  const statusColor = documentStatuses.find((s) => s.value === status)?.color || "gray";
+  const statusLabel = documentStatuses.find((s) => s.value === status)?.label || status;
 
   return (
     <div className="flex flex-col h-full">
@@ -234,7 +296,7 @@ export default function DocumentEditor() {
                   : "bg-gray-100 text-gray-800 dark:bg-gray-800/50 dark:text-gray-400"
               }`}
             >
-              {status}
+              {statusLabel}
             </Badge>
             {!isNewDocument && versions.length > 0 && (
               <Badge variant="outline" className="text-xs font-mono">
@@ -251,7 +313,7 @@ export default function DocumentEditor() {
                 <SheetTrigger asChild>
                   <Button variant="outline" size="sm" data-testid="button-version-history">
                     <GitBranch className="mr-2 h-4 w-4" />
-                    History
+                    {t("editor.history")}
                   </Button>
                 </SheetTrigger>
                 <SheetContent className="w-[400px] sm:w-[540px] p-0">
@@ -276,7 +338,7 @@ export default function DocumentEditor() {
                 data-testid="button-compare"
               >
                 <GitCompare className="mr-2 h-4 w-4" />
-                Compare
+                {t("editor.compare")}
               </Button>
 
               <Sheet open={showComments} onOpenChange={setShowComments}>
@@ -287,7 +349,7 @@ export default function DocumentEditor() {
                     data-testid="button-comments"
                   >
                     <MessageSquare className="mr-2 h-4 w-4" />
-                    Comments
+                    {t("editor.comments")}
                   </Button>
                 </SheetTrigger>
                 <SheetContent className="w-[400px] sm:w-[450px] p-0">
@@ -307,7 +369,7 @@ export default function DocumentEditor() {
                     data-testid="button-export-pdf"
                   >
                     <Download className="mr-2 h-4 w-4" />
-                    Export PDF
+                    {t("editor.exportPdf")}
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
@@ -316,7 +378,7 @@ export default function DocumentEditor() {
                     data-testid="button-export-current"
                   >
                     <Download className="mr-2 h-4 w-4" />
-                    Export Current Version
+                    {t("editor.exportCurrentVersion")}
                   </DropdownMenuItem>
                   {versions.length > 0 && (
                     <>
@@ -328,7 +390,7 @@ export default function DocumentEditor() {
                           data-testid={`button-export-version-${v.id}`}
                         >
                           <Clock className="mr-2 h-4 w-4" />
-                          Export v{v.versionNumber}
+                          {t("editor.exportVersion", { version: v.versionNumber })}
                         </DropdownMenuItem>
                       ))}
                     </>
@@ -344,32 +406,54 @@ export default function DocumentEditor() {
             data-testid="button-save"
           >
             <Save className="mr-2 h-4 w-4" />
-            {isSaving ? "Saving..." : "Save"}
+            {isSaving ? t("editor.saving") : t("editor.save")}
           </Button>
 
           {!isNewDocument && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" data-testid="button-more-options">
-                  <MoreVertical className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => exportPdf.mutate(undefined)}>
-                  <Download className="mr-2 h-4 w-4" />
-                  Export as PDF
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={() => deleteDocument.mutate()}
-                  className="text-destructive"
-                  data-testid="button-delete-document"
-                >
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  Delete Document
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" data-testid="button-more-options">
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => exportPdf.mutate(undefined)}>
+                    <Download className="mr-2 h-4 w-4" />
+                    {t("editor.exportAsPdf")}
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={() => setShowDeleteConfirm(true)}
+                    className="text-destructive"
+                    data-testid="button-delete-document"
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    {t("editor.deleteDocument")}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>{t("deleteConfirm.title")}</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      {t("deleteConfirm.description")}
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>{t("deleteConfirm.cancel")}</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={() => deleteDocument.mutate()}
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    >
+                      {t("deleteConfirm.confirm")}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </>
           )}
         </div>
       </motion.header>
@@ -382,21 +466,93 @@ export default function DocumentEditor() {
             transition={{ delay: 0.1 }}
             className="space-y-4"
           >
-            <Input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Document title..."
-              className="text-2xl font-bold border-0 bg-transparent px-0 focus-visible:ring-0 placeholder:text-muted-foreground/50"
-              data-testid="input-title"
-            />
+            <Popover open={clientPopoverOpen} onOpenChange={setClientPopoverOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={clientPopoverOpen}
+                  className="w-full justify-between text-left font-normal h-12 text-lg border-dashed"
+                  data-testid="input-client"
+                >
+                  <div className="flex items-center gap-2 truncate">
+                    <Building2 className="h-5 w-5 shrink-0 text-muted-foreground" />
+                    {company ? (
+                      <span className="font-semibold">{company}</span>
+                    ) : (
+                      <span className="text-muted-foreground">{t("editor.clientPlaceholder")}</span>
+                    )}
+                  </div>
+                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[400px] p-0" align="start">
+                <Command shouldFilter={false}>
+                  <CommandInput
+                    placeholder={t("editor.searchClient")}
+                    value={clientSearch}
+                    onValueChange={setClientSearch}
+                  />
+                  <CommandList>
+                    <CommandEmpty>
+                      <div className="p-2">
+                        <p className="text-sm text-muted-foreground mb-2">
+                          {t("editor.noClientFound")}
+                        </p>
+                        {clientSearch && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="w-full"
+                            onClick={() => {
+                              setCompany(clientSearch);
+                              setClientPopoverOpen(false);
+                              setClientSearch("");
+                            }}
+                          >
+                            {t("editor.createClient", { name: clientSearch })}
+                          </Button>
+                        )}
+                      </div>
+                    </CommandEmpty>
+                    <CommandGroup heading={t("editor.existingClients")}>
+                      {existingClients
+                        .filter((client) =>
+                          client.toLowerCase().includes(clientSearch.toLowerCase())
+                        )
+                        .map((client) => (
+                          <CommandItem
+                            key={client}
+                            value={client}
+                            onSelect={() => {
+                              setCompany(client);
+                              setClientPopoverOpen(false);
+                              setClientSearch("");
+                            }}
+                          >
+                            <Building2 className="mr-2 h-4 w-4 text-muted-foreground" />
+                            {client}
+                            <Check
+                              className={cn(
+                                "ml-auto h-4 w-4",
+                                company === client ? "opacity-100" : "opacity-0"
+                              )}
+                            />
+                          </CommandItem>
+                        ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
 
             <div className="flex flex-wrap gap-3">
               <Select value={category} onValueChange={setCategory}>
-                <SelectTrigger className="w-[160px]" data-testid="select-category">
-                  <SelectValue placeholder="Category" />
+                <SelectTrigger className="w-[200px]" data-testid="select-category">
+                  <SelectValue placeholder={t("editor.category")} />
                 </SelectTrigger>
                 <SelectContent>
-                  {DOCUMENT_CATEGORIES.map((cat) => (
+                  {documentCategories.map((cat) => (
                     <SelectItem key={cat.value} value={cat.value}>
                       {cat.label}
                     </SelectItem>
@@ -406,10 +562,10 @@ export default function DocumentEditor() {
 
               <Select value={status} onValueChange={setStatus}>
                 <SelectTrigger className="w-[140px]" data-testid="select-status">
-                  <SelectValue placeholder="Status" />
+                  <SelectValue placeholder={t("editor.status")} />
                 </SelectTrigger>
                 <SelectContent>
-                  {DOCUMENT_STATUSES.map((s) => (
+                  {documentStatuses.map((s) => (
                     <SelectItem key={s.value} value={s.value}>
                       {s.label}
                     </SelectItem>
@@ -427,7 +583,7 @@ export default function DocumentEditor() {
             <RichTextEditor
               content={content}
               onChange={setContent}
-              placeholder="Start writing your document..."
+              placeholder={t("editor.contentPlaceholder")}
             />
           </motion.div>
         </div>

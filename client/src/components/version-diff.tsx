@@ -1,12 +1,13 @@
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
-import { format } from "date-fns";
 import { GitCompare, ArrowRight, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import type { Version } from "@shared/schema";
 import DiffMatchPatch from "diff-match-patch";
+import { formatDateTime } from "@/lib/date-utils";
 
 interface VersionDiffProps {
   version1: Version;
@@ -15,6 +16,7 @@ interface VersionDiffProps {
 }
 
 export function VersionDiff({ version1, version2, onClose }: VersionDiffProps) {
+  const { t, i18n } = useTranslation("documents");
   const dmp = useMemo(() => new DiffMatchPatch(), []);
 
   const stripHtml = (html: string) => {
@@ -65,9 +67,9 @@ export function VersionDiff({ version1, version2, onClose }: VersionDiffProps) {
               <GitCompare className="h-5 w-5 text-primary" />
             </div>
             <div>
-              <h2 className="font-semibold">Version Comparison</h2>
+              <h2 className="font-semibold">{t("diff.title")}</h2>
               <p className="text-xs text-muted-foreground">
-                Comparing changes between versions
+                {t("diff.comparing", { v1: older.versionNumber, v2: newer.versionNumber })}
               </p>
             </div>
           </div>
@@ -77,22 +79,22 @@ export function VersionDiff({ version1, version2, onClose }: VersionDiffProps) {
         </div>
 
         <div className="flex items-center justify-center gap-4 p-4 bg-muted/30 border-b">
-          <VersionBadge version={older} label="From" />
+          <VersionBadge version={older} label={t("diff.from")} lang={i18n.language} />
           <ArrowRight className="h-4 w-4 text-muted-foreground" />
-          <VersionBadge version={newer} label="To" />
+          <VersionBadge version={newer} label={t("diff.to")} lang={i18n.language} />
         </div>
 
         <div className="flex items-center gap-4 px-4 py-2 border-b text-xs">
           <div className="flex items-center gap-2">
             <span className="inline-block w-3 h-3 rounded-sm bg-green-500/20 border border-green-500" />
             <span className="text-muted-foreground">
-              <span className="font-medium text-green-600 dark:text-green-400">+{stats.added}</span> characters added
+              <span className="font-medium text-green-600 dark:text-green-400">+{stats.added}</span> {t("diff.additions", { count: stats.added })}
             </span>
           </div>
           <div className="flex items-center gap-2">
             <span className="inline-block w-3 h-3 rounded-sm bg-red-500/20 border border-red-500" />
             <span className="text-muted-foreground">
-              <span className="font-medium text-red-600 dark:text-red-400">-{stats.removed}</span> characters removed
+              <span className="font-medium text-red-600 dark:text-red-400">-{stats.removed}</span> {t("diff.deletions", { count: stats.removed })}
             </span>
           </div>
         </div>
@@ -138,9 +140,10 @@ export function VersionDiff({ version1, version2, onClose }: VersionDiffProps) {
 interface VersionBadgeProps {
   version: Version;
   label: string;
+  lang: string;
 }
 
-function VersionBadge({ version, label }: VersionBadgeProps) {
+function VersionBadge({ version, label, lang }: VersionBadgeProps) {
   return (
     <div className="flex flex-col items-center">
       <span className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1">
@@ -150,7 +153,7 @@ function VersionBadge({ version, label }: VersionBadgeProps) {
         v{version.versionNumber}
       </Badge>
       <span className="text-[10px] text-muted-foreground mt-1">
-        {format(new Date(version.createdAt), "MMM d, HH:mm")}
+        {formatDateTime(new Date(version.createdAt), lang, "MMM d, HH:mm")}
       </span>
     </div>
   );

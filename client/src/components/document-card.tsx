@@ -1,6 +1,7 @@
+import { useState } from "react";
 import { Link } from "wouter";
+import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
-import { formatDistanceToNow } from "date-fns";
 import { BookOpen, CheckSquare, FileCheck, FileText, MoreVertical, Clock, User } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +12,17 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { useRelativeTime } from "@/lib/date-utils";
 import type { Document } from "@shared/schema";
 
 interface DocumentCardProps {
@@ -33,12 +45,35 @@ const statusColors = {
 };
 
 export function DocumentCard({ document, onDelete, index = 0, canDelete = false }: DocumentCardProps) {
+  const { t } = useTranslation("common");
+  const { t: tDocuments } = useTranslation("documents");
+  const relativeTime = useRelativeTime();
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  
   const Icon = categoryIcons[document.category as keyof typeof categoryIcons] || FileText;
   const statusColor = statusColors[document.status as keyof typeof statusColors] || statusColors.draft;
 
+  const getCategoryLabel = (category: string) => {
+    switch (category) {
+      case "manual": return t("categories.manual");
+      case "checklist": return t("categories.checklist");
+      case "guide": return t("categories.guide");
+      default: return category;
+    }
+  };
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case "draft": return t("statuses.draft");
+      case "published": return t("statuses.published");
+      case "archived": return t("statuses.archived");
+      default: return status;
+    }
+  };
+
   const getPreviewText = (content: string) => {
     const stripped = content.replace(/<[^>]*>/g, "").trim();
-    return stripped.length > 120 ? stripped.substring(0, 120) + "..." : stripped || "No content yet";
+    return stripped.length > 120 ? stripped.substring(0, 120) + "..." : stripped || tDocuments("list.noContent");
   };
 
   return (
@@ -49,7 +84,7 @@ export function DocumentCard({ document, onDelete, index = 0, canDelete = false 
     >
       <Link href={`/document/${document.id}`}>
         <Card
-          className="group cursor-pointer transition-all duration-200 hover-elevate"
+          className="group cursor-pointer transition-all duration-200 hover-elevate h-[160px] flex flex-col"
           data-testid={`card-document-${document.id}`}
         >
           <CardHeader className="flex flex-row items-start justify-between gap-2 space-y-0 pb-2">
@@ -61,7 +96,7 @@ export function DocumentCard({ document, onDelete, index = 0, canDelete = false 
                 <h3 className="font-medium text-sm truncate" data-testid={`text-title-${document.id}`}>
                   {document.title}
                 </h3>
-                <p className="text-xs text-muted-foreground capitalize">{document.category}</p>
+                <p className="text-xs text-muted-foreground">{getCategoryLabel(document.category)}</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -69,41 +104,63 @@ export function DocumentCard({ document, onDelete, index = 0, canDelete = false 
                 variant="secondary"
                 className={`text-xs shrink-0 no-default-hover-elevate no-default-active-elevate ${statusColor}`}
               >
-                {document.status}
+                {getStatusLabel(document.status)}
               </Badge>
               {canDelete && (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild onClick={(e) => e.preventDefault()}>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
-                      data-testid={`button-menu-${document.id}`}
-                    >
-                      <MoreVertical className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
-                    <DropdownMenuItem
-                      onClick={(e) => {
-                        e.preventDefault();
-                        onDelete?.(document.id);
-                      }}
-                      className="text-destructive"
-                      data-testid={`button-delete-${document.id}`}
-                    >
-                      Delete
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild onClick={(e) => e.preventDefault()}>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                        data-testid={`button-menu-${document.id}`}
+                      >
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
+                      <DropdownMenuItem
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setShowDeleteConfirm(true);
+                        }}
+                        className="text-destructive"
+                        data-testid={`button-delete-${document.id}`}
+                      >
+                        {t("buttons.delete")}
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+
+                  <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+                    <AlertDialogContent onClick={(e) => e.stopPropagation()}>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>{tDocuments("deleteConfirm.title")}</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          {tDocuments("deleteConfirm.description")}
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>{tDocuments("deleteConfirm.cancel")}</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() => onDelete?.(document.id)}
+                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                          {tDocuments("deleteConfirm.confirm")}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </>
               )}
             </div>
           </CardHeader>
-          <CardContent className="pb-4">
-            <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+          <CardContent className="pb-4 flex-1 flex flex-col">
+            <p className="text-sm text-muted-foreground line-clamp-2 mb-3 min-h-[40px]">
               {getPreviewText(document.content)}
             </p>
-            <div className="flex items-center gap-4 text-xs text-muted-foreground">
+            <div className="flex items-center gap-4 text-xs text-muted-foreground mt-auto">
               <div className="flex items-center gap-1">
                 <User className="h-3 w-3" />
                 <span>{document.authorName}</span>
@@ -111,7 +168,7 @@ export function DocumentCard({ document, onDelete, index = 0, canDelete = false 
               <div className="flex items-center gap-1">
                 <Clock className="h-3 w-3" />
                 <span>
-                  {formatDistanceToNow(new Date(document.updatedAt), { addSuffix: true })}
+                  {relativeTime(new Date(document.updatedAt))}
                 </span>
               </div>
             </div>

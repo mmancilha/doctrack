@@ -1,0 +1,84 @@
+{
+  "appName": "DocTrack",
+  "appDescription": "Document Management System",
+  "buttons": {
+    "save": "Save",
+    "saving": "Saving...",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "create": "Create",
+    "edit": "Edit",
+    "close": "Close",
+    "back": "Back",
+    "viewAll": "View All",
+    "remove": "Remove",
+    "confirm": "Confirm",
+    "goToDashboard": "Go to Dashboard"
+  },
+  "errors": {
+    "generic": "An error occurred. Please try again.",
+    "unauthorized": "You are not authorized to perform this action.",
+    "notFound": "Resource not found.",
+    "serverError": "Server error. Please try again later.",
+    "connectionError": "Connection error. Please check your internet.",
+    "timeout": "Connection timed out. Please try again."
+  },
+  "loading": "Loading...",
+  "noResults": "No results found.",
+  "search": "Search...",
+  "navigation": {
+    "title": "Navigation",
+    "dashboard": "Dashboard",
+    "allDocuments": "All Documents",
+    "recent": "Recent"
+  },
+  "categories": {
+    "title": "Categories",
+    "manual": "Manual",
+    "manuals": "Manuals",
+    "checklist": "Checklist",
+    "checklists": "Checklists",
+    "guide": "Guide",
+    "guides": "Guides",
+    "confidentiality": "Confidentiality Agreement",
+    "confidentialities": "Confidentiality Agreements",
+    "proposal": "Commercial Proposal",
+    "proposals": "Commercial Proposals",
+    "contract": "Contract",
+    "contracts": "Contracts",
+    "policy": "Policy",
+    "policies": "Policies",
+    "procedure": "Procedure",
+    "procedures": "Procedures"
+  },
+  "statuses": {
+    "draft": "Draft",
+    "published": "Published",
+    "archived": "Archived"
+  },
+  "roles": {
+    "admin": "Admin",
+    "editor": "Editor",
+    "reader": "Reader"
+  },
+  "time": {
+    "justNow": "just now",
+    "minutesAgo": "{{count}} minute ago",
+    "minutesAgo_other": "{{count}} minutes ago",
+    "hoursAgo": "{{count}} hour ago",
+    "hoursAgo_other": "{{count}} hours ago",
+    "daysAgo": "{{count}} day ago",
+    "daysAgo_other": "{{count}} days ago"
+  },
+  "menu": {
+    "account": "Account",
+    "notifications": "Notifications",
+    "language": "Language",
+    "logout": "Log out"
+  },
+  "accessDenied": {
+    "title": "Access Denied",
+    "adminOnly": "Only administrators can access this feature."
+  }
+}
+

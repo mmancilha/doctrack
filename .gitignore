@@ -4,3 +4,30 @@ dist
 server/public
 vite.config.ts.*
 *.tar.gz
+
+# Documentation files
+*.md
+!README.md
+
+# Local files
+.local/
+
+# Backup files
+*.backup.*
+
+# IDE
+.vscode/
+.idea/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# Database
+*.db
+*.sqlite

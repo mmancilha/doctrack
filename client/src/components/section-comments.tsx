@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
-import { formatDistanceToNow } from "date-fns";
 import { MessageSquare, Send, X, Check, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -11,6 +11,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/lib/auth";
+import { formatRelativeTime } from "@/lib/date-utils";
 import type { Comment } from "@shared/schema";
 
 interface SectionCommentsProps {
@@ -20,6 +21,7 @@ interface SectionCommentsProps {
 }
 
 export function SectionComments({ documentId, selectedText, onClose }: SectionCommentsProps) {
+  const { t, i18n } = useTranslation("documents");
   const { user, canEdit } = useAuth();
   const { toast } = useToast();
   const [newComment, setNewComment] = useState("");
@@ -43,10 +45,10 @@ export function SectionComments({ documentId, selectedText, onClose }: SectionCo
       queryClient.invalidateQueries({ queryKey: ["/api/documents", documentId, "comments"] });
       setNewComment("");
       setShowInput(false);
-      toast({ title: "Comment added", description: "Your comment has been posted." });
+      toast({ title: t("comments.toast.added.title"), description: t("comments.toast.added.description") });
     },
     onError: () => {
-      toast({ title: "Error", description: "Failed to add comment.", variant: "destructive" });
+      toast({ title: t("toast.error.title"), description: t("comments.toast.error.add"), variant: "destructive" });
     },
   });
 
@@ -59,7 +61,7 @@ export function SectionComments({ documentId, selectedText, onClose }: SectionCo
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/documents", documentId, "comments"] });
-      toast({ title: "Comment resolved" });
+      toast({ title: t("comments.toast.deleted.title") });
     },
   });
 
@@ -81,7 +83,7 @@ export function SectionComments({ documentId, selectedText, onClose }: SectionCo
       <CardHeader className="pb-3 flex flex-row items-center justify-between gap-2">
         <CardTitle className="text-base flex items-center gap-2">
           <MessageSquare className="h-4 w-4" />
-          Comments ({unresolvedComments.length})
+          {t("comments.title")} ({unresolvedComments.length})
         </CardTitle>
         {onClose && (
           <Button variant="ghost" size="icon" onClick={onClose}>
@@ -92,7 +94,7 @@ export function SectionComments({ documentId, selectedText, onClose }: SectionCo
       <CardContent className="flex-1 flex flex-col gap-4 overflow-hidden">
         {selectedText && (
           <div className="p-3 bg-muted rounded-md border-l-4 border-primary">
-            <p className="text-xs text-muted-foreground mb-1">Selected text:</p>
+            <p className="text-xs text-muted-foreground mb-1">{t("comments.selectedText")}:</p>
             <p className="text-sm italic line-clamp-3">"{selectedText}"</p>
           </div>
         )}
@@ -106,12 +108,12 @@ export function SectionComments({ documentId, selectedText, onClose }: SectionCo
               data-testid="button-add-comment"
             >
               <MessageSquare className="mr-2 h-4 w-4" />
-              Add Comment
+              {t("comments.addComment")}
             </Button>
           ) : (
             <div className="w-full space-y-2">
               <Textarea
-                placeholder={selectedText ? "Comment on this section..." : "Add a general comment..."}
+                placeholder={t("comments.placeholder")}
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
                 className="min-h-[80px] resize-none"
@@ -125,7 +127,7 @@ export function SectionComments({ documentId, selectedText, onClose }: SectionCo
                   data-testid="button-submit-comment"
                 >
                   <Send className="mr-2 h-3 w-3" />
-                  Post
+                  {t("comments.send")}
                 </Button>
                 <Button
                   size="sm"
@@ -135,7 +137,7 @@ export function SectionComments({ documentId, selectedText, onClose }: SectionCo
                     setNewComment("");
                   }}
                 >
-                  Cancel
+                  {t("comments.cancel")}
                 </Button>
               </div>
             </div>
@@ -144,9 +146,9 @@ export function SectionComments({ documentId, selectedText, onClose }: SectionCo
 
         <ScrollArea className="flex-1">
           {isLoading ? (
-            <p className="text-sm text-muted-foreground text-center py-4">Loading comments...</p>
+            <p className="text-sm text-muted-foreground text-center py-4">{t("comments.loading")}</p>
           ) : comments.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center py-4">No comments yet</p>
+            <p className="text-sm text-muted-foreground text-center py-4">{t("comments.noComments")}</p>
           ) : (
             <div className="space-y-4">
               {unresolvedComments.length > 0 && (
@@ -172,7 +174,7 @@ export function SectionComments({ documentId, selectedText, onClose }: SectionCo
                             <User className="h-3 w-3" />
                             <span>{comment.authorName}</span>
                             <span>·</span>
-                            <span>{formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}</span>
+                            <span>{formatRelativeTime(new Date(comment.createdAt), i18n.language)}</span>
                           </div>
                           {canEdit && (
                             <Button
@@ -183,7 +185,7 @@ export function SectionComments({ documentId, selectedText, onClose }: SectionCo
                               data-testid={`button-resolve-${comment.id}`}
                             >
                               <Check className="mr-1 h-3 w-3" />
-                              Resolve
+                              {t("comments.resolve")}
                             </Button>
                           )}
                         </div>
@@ -195,7 +197,7 @@ export function SectionComments({ documentId, selectedText, onClose }: SectionCo
 
               {resolvedComments.length > 0 && (
                 <div className="space-y-3">
-                  <p className="text-xs text-muted-foreground font-medium">Resolved ({resolvedComments.length})</p>
+                  <p className="text-xs text-muted-foreground font-medium">{t("comments.resolved")} ({resolvedComments.length})</p>
                   {resolvedComments.map((comment) => (
                     <div
                       key={comment.id}
@@ -208,7 +210,7 @@ export function SectionComments({ documentId, selectedText, onClose }: SectionCo
                       )}
                       <p className="text-sm line-through">{comment.content}</p>
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <Badge variant="secondary" className="text-xs">Resolved</Badge>
+                        <Badge variant="secondary" className="text-xs">{t("comments.resolved")}</Badge>
                         <span>{comment.authorName}</span>
                       </div>
                     </div>

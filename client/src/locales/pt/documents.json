@@ -1,0 +1,181 @@
+{
+  "richEditor": {
+    "loading": "Carregando editor...",
+    "promptUrl": "Digite a URL:",
+    "promptImageUrl": "Digite a URL da imagem:",
+    "undo": "Desfazer",
+    "redo": "Refazer",
+    "heading1": "Título 1",
+    "heading2": "Título 2",
+    "heading3": "Título 3",
+    "bold": "Negrito",
+    "italic": "Itálico",
+    "underline": "Sublinhado",
+    "strikethrough": "Tachado",
+    "code": "Código",
+    "bulletList": "Lista com Marcadores",
+    "orderedList": "Lista Numerada",
+    "quote": "Citação",
+    "horizontalRule": "Linha Horizontal",
+    "addLink": "Adicionar Link",
+    "addImage": "Adicionar Imagem",
+    "insertTable": "Inserir Tabela"
+  },
+  "editor": {
+    "titlePlaceholder": "Título do documento...",
+    "contentPlaceholder": "Comece a escrever seu documento...",
+    "category": "Categoria",
+    "status": "Status",
+    "client": "Cliente",
+    "clientPlaceholder": "Selecione ou digite o nome do cliente...",
+    "searchClient": "Buscar cliente...",
+    "noClientFound": "Nenhum cliente encontrado.",
+    "createClient": "Criar cliente \"{{name}}\"",
+    "existingClients": "Clientes existentes",
+    "save": "Salvar",
+    "saving": "Salvando...",
+    "history": "Histórico",
+    "compare": "Comparar",
+    "comments": "Comentários",
+    "exportPdf": "Exportar PDF",
+    "exportCurrentVersion": "Exportar Versão Atual",
+    "exportVersion": "Exportar v{{version}}",
+    "exportAsPdf": "Exportar como PDF",
+    "deleteDocument": "Excluir Documento",
+    "moreOptions": "Mais opções"
+  },
+  "deleteConfirm": {
+    "title": "Excluir documento?",
+    "description": "Esta ação é irreversível. O documento será removido permanentemente do sistema.",
+    "cancel": "Cancelar",
+    "confirm": "Excluir"
+  },
+  "toast": {
+    "created": {
+      "title": "Documento criado",
+      "description": "Seu documento foi salvo."
+    },
+    "saved": {
+      "title": "Documento salvo",
+      "description": "Suas alterações foram salvas."
+    },
+    "deleted": {
+      "title": "Documento excluído",
+      "description": "O documento foi removido."
+    },
+    "exported": {
+      "title": "PDF exportado",
+      "description": "Seu documento foi baixado."
+    },
+    "versionLoaded": {
+      "title": "Versão carregada",
+      "description": "Versão {{version}} carregada. Salve para manter as alterações."
+    },
+    "error": {
+      "title": "Erro",
+      "create": "Falha ao criar documento.",
+      "save": "Falha ao salvar documento.",
+      "export": "Falha ao exportar PDF.",
+      "noTitle": "Por favor, insira um título para o documento.",
+      "noClient": "Por favor, insira o nome do cliente.",
+      "noPermission": "Você não tem permissão para editar documentos."
+    }
+  },
+  "versions": {
+    "title": "Histórico de Versões",
+    "count": "{{count}} versão",
+    "count_other": "{{count}} versões",
+    "latest": "Mais recente",
+    "selected": "Selecionado",
+    "noVersions": "Nenhuma versão ainda",
+    "noVersionsHint": "Versões são criadas quando você salva alterações",
+    "selectToCompare": "Clique em uma versão para selecionar para comparação",
+    "selectedVersion": "Selecionada v{{version}}. Clique em outra versão para comparar."
+  },
+  "diff": {
+    "title": "Comparação de Versões",
+    "comparing": "Comparando v{{v1}} com v{{v2}}",
+    "from": "De",
+    "to": "Para",
+    "additions": "caracteres adicionados",
+    "additions_other": "caracteres adicionados",
+    "deletions": "caracteres removidos",
+    "deletions_other": "caracteres removidos",
+    "noChanges": "Sem alterações de texto entre as versões",
+    "noChangesHint": "Os documentos podem ter outras diferenças não mostradas em texto simples."
+  },
+  "comments": {
+    "title": "Comentários",
+    "placeholder": "Adicione um comentário...",
+    "send": "Enviar",
+    "cancel": "Cancelar",
+    "addComment": "Adicionar Comentário",
+    "selectedText": "Texto selecionado",
+    "loading": "Carregando comentários...",
+    "noComments": "Nenhum comentário ainda",
+    "noCommentsHint": "Seja o primeiro a comentar neste documento.",
+    "resolve": "Resolver",
+    "resolved": "Resolvido",
+    "deleteConfirm": "Tem certeza que deseja excluir este comentário?",
+    "toast": {
+      "added": {
+        "title": "Comentário adicionado",
+        "description": "Seu comentário foi publicado."
+      },
+      "deleted": {
+        "title": "Comentário excluído",
+        "description": "O comentário foi removido."
+      },
+      "error": {
+        "add": "Falha ao adicionar comentário.",
+        "delete": "Falha ao excluir comentário."
+      }
+    }
+  },
+  "list": {
+    "title": "Todos os Documentos",
+    "description": "Navegue e gerencie toda sua documentação.",
+    "empty": {
+      "title": "Nenhum documento encontrado",
+      "description": "Tente ajustar sua busca ou crie um novo documento."
+    },
+    "search": "Buscar documentos...",
+    "noContent": "Sem conteúdo ainda"
+  },
+  "recent": {
+    "title": "Documentos Recentes",
+    "description": "Documentos que você visualizou ou editou recentemente.",
+    "empty": {
+      "title": "Nenhum documento recente",
+      "description": "Documentos que você visualizar ou editar aparecerão aqui."
+    }
+  },
+  "category": {
+    "title": "{{category}}",
+    "description": "Navegue por todos os {{category}} da sua biblioteca.",
+    "empty": {
+      "title": "Nenhum {{category}} encontrado",
+      "description": "Crie seu primeiro {{singular}} para começar."
+    }
+  },
+  "notFound": {
+    "title": "Página Não Encontrada",
+    "description": "A página que você está procurando não existe ou foi movida."
+  },
+  "filters": {
+    "allTime": "Todo o período",
+    "last7Days": "Últimos 7 dias",
+    "last30Days": "Últimos 30 dias",
+    "last90Days": "Últimos 90 dias",
+    "allCategories": "Todas as Categorias",
+    "allStatuses": "Todos os Status",
+    "date": "Data",
+    "activeFilters": "Filtros ativos",
+    "search": "Busca",
+    "clearAll": "Limpar tudo",
+    "showing": "Exibindo",
+    "documents": "documentos",
+    "document": "documento"
+  }
+}
+

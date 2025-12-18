@@ -1,17 +1,20 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
+import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
-import { FileText, Plus, Clock, CheckCircle, FolderOpen, TrendingUp } from "lucide-react";
+import { FileText, Clock, CheckCircle, FolderOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StatsCard } from "@/components/stats-card";
 import { DocumentCard } from "@/components/document-card";
 import { EmptyState } from "@/components/empty-state";
-import { DashboardSkeleton, DocumentListSkeleton } from "@/components/loading-skeleton";
+import { DashboardSkeleton } from "@/components/loading-skeleton";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/lib/auth";
 import type { Document } from "@shared/schema";
 
 export default function Dashboard() {
+  const { t } = useTranslation("dashboard");
+  const { t: tCommon } = useTranslation("common");
   const [, setLocation] = useLocation();
   const { canEdit, canDelete } = useAuth();
 
@@ -52,64 +55,50 @@ export default function Dashboard() {
 
   return (
     <div className="p-6 space-y-8">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <motion.h1
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-2xl font-bold tracking-tight"
-          >
-            Dashboard
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.1 }}
-            className="text-sm text-muted-foreground"
-          >
-            Welcome back! Here's an overview of your documentation.
-          </motion.p>
-        </div>
-        {canEdit && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2 }}
-          >
-            <Button onClick={() => setLocation("/new")} data-testid="button-create-document">
-              <Plus className="mr-2 h-4 w-4" />
-              New Document
-            </Button>
-          </motion.div>
-        )}
+      <div>
+        <motion.h1
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-2xl font-bold tracking-tight"
+        >
+          {t("title")}
+        </motion.h1>
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.1 }}
+          className="text-sm text-muted-foreground"
+        >
+          {t("welcome")}
+        </motion.p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatsCard
-          title="Total Documents"
+          title={t("stats.totalDocuments")}
           value={stats.total}
-          description="All documents in your library"
+          description={t("stats.totalDescription")}
           icon={FileText}
           index={0}
         />
         <StatsCard
-          title="Published"
+          title={t("stats.published")}
           value={stats.published}
-          description="Documents ready for use"
+          description={t("stats.publishedDescription")}
           icon={CheckCircle}
           index={1}
         />
         <StatsCard
-          title="Drafts"
+          title={t("stats.drafts")}
           value={stats.drafts}
-          description="Work in progress"
+          description={t("stats.draftsDescription")}
           icon={Clock}
           index={2}
         />
         <StatsCard
-          title="Categories"
+          title={t("stats.categories")}
           value={3}
-          description={`${stats.manuals} manuals, ${stats.checklists} checklists, ${stats.guides} guides`}
+          description={t("stats.categoriesDescription", { manuals: stats.manuals, checklists: stats.checklists, guides: stats.guides })}
           icon={FolderOpen}
           index={3}
         />
@@ -123,7 +112,7 @@ export default function Dashboard() {
             transition={{ delay: 0.3 }}
             className="text-lg font-semibold"
           >
-            Recent Documents
+            {t("recentDocuments")}
           </motion.h2>
           {docs.length > 0 && (
             <Button
@@ -132,7 +121,7 @@ export default function Dashboard() {
               onClick={() => setLocation("/documents")}
               data-testid="button-view-all"
             >
-              View All
+              {tCommon("buttons.viewAll")}
             </Button>
           )}
         </div>
@@ -140,10 +129,10 @@ export default function Dashboard() {
         {docs.length === 0 ? (
           <EmptyState
             icon={FileText}
-            title="No documents yet"
-            description={canEdit ? "Create your first document to get started with DocTrack." : "No documents are available yet."}
+            title={t("empty.title")}
+            description={canEdit ? t("empty.descriptionEditor") : t("empty.descriptionReader")}
             action={canEdit ? {
-              label: "Create Document",
+              label: t("empty.action"),
               onClick: () => setLocation("/new"),
             } : undefined}
           />

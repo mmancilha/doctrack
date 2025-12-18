@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { useLocation } from "wouter";
-import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import {
   Command,
   CommandDialog,
@@ -30,6 +30,9 @@ interface CommandPaletteProps {
 }
 
 export function CommandPalette({ documents }: CommandPaletteProps) {
+  const { t } = useTranslation("common");
+  const { t: tDashboard } = useTranslation("dashboard");
+  const { t: tDocuments } = useTranslation("documents");
   const [open, setOpen] = useState(false);
   const [, setLocation] = useLocation();
   const { canEdit } = useAuth();
@@ -64,11 +67,20 @@ export function CommandPalette({ documents }: CommandPaletteProps) {
     }
   };
 
+  const getCategoryLabel = (category: string) => {
+    switch (category) {
+      case "manual": return t("categories.manual");
+      case "checklist": return t("categories.checklist");
+      case "guide": return t("categories.guide");
+      default: return category;
+    }
+  };
+
   return (
     <CommandDialog open={open} onOpenChange={setOpen}>
       <Command className="rounded-lg border-0">
         <CommandInput
-          placeholder="Search documents, navigate..."
+          placeholder={t("search")}
           className="border-0"
           data-testid="input-command-search"
         />
@@ -76,57 +88,54 @@ export function CommandPalette({ documents }: CommandPaletteProps) {
           <CommandEmpty>
             <div className="flex flex-col items-center justify-center py-6 text-center">
               <Search className="h-10 w-10 text-muted-foreground/50 mb-3" />
-              <p className="text-sm text-muted-foreground">No results found.</p>
-              <p className="text-xs text-muted-foreground/70 mt-1">
-                Try searching for a document title or category
-              </p>
+              <p className="text-sm text-muted-foreground">{t("noResults")}</p>
             </div>
           </CommandEmpty>
 
           {canEdit && (
             <>
-              <CommandGroup heading="Quick Actions">
+              <CommandGroup heading={t("buttons.create")}>
                 <CommandItem
                   onSelect={() => runCommand(() => setLocation("/new"))}
                   data-testid="command-new-document"
                 >
                   <Plus className="mr-2 h-4 w-4" />
-                  <span>New Document</span>
-                  <span className="ml-auto text-xs text-muted-foreground">Create</span>
+                  <span>{tDashboard("newDocument")}</span>
+                  <span className="ml-auto text-xs text-muted-foreground">{t("buttons.create")}</span>
                 </CommandItem>
               </CommandGroup>
               <CommandSeparator />
             </>
           )}
 
-          <CommandGroup heading="Navigation">
+          <CommandGroup heading={t("navigation.title")}>
             <CommandItem
               onSelect={() => runCommand(() => setLocation("/"))}
               data-testid="command-dashboard"
             >
               <Home className="mr-2 h-4 w-4" />
-              <span>Dashboard</span>
+              <span>{t("navigation.dashboard")}</span>
             </CommandItem>
             <CommandItem
               onSelect={() => runCommand(() => setLocation("/documents"))}
               data-testid="command-all-documents"
             >
               <FolderOpen className="mr-2 h-4 w-4" />
-              <span>All Documents</span>
+              <span>{t("navigation.allDocuments")}</span>
             </CommandItem>
             <CommandItem
               onSelect={() => runCommand(() => setLocation("/recent"))}
               data-testid="command-recent"
             >
               <Clock className="mr-2 h-4 w-4" />
-              <span>Recent Documents</span>
+              <span>{tDocuments("recent.title")}</span>
             </CommandItem>
           </CommandGroup>
 
           {documents.length > 0 && (
             <>
               <CommandSeparator />
-              <CommandGroup heading="Documents">
+              <CommandGroup heading={tDocuments("list.title")}>
                 {documents.slice(0, 5).map((doc) => {
                   const Icon = getCategoryIcon(doc.category);
                   return (
@@ -137,8 +146,8 @@ export function CommandPalette({ documents }: CommandPaletteProps) {
                     >
                       <Icon className="mr-2 h-4 w-4" />
                       <span className="truncate">{doc.title}</span>
-                      <span className="ml-auto text-xs text-muted-foreground capitalize">
-                        {doc.category}
+                      <span className="ml-auto text-xs text-muted-foreground">
+                        {getCategoryLabel(doc.category)}
                       </span>
                     </CommandItem>
                   );
@@ -153,6 +162,8 @@ export function CommandPalette({ documents }: CommandPaletteProps) {
 }
 
 export function CommandPaletteTrigger() {
+  const { t } = useTranslation("common");
+  
   return (
     <button
       className="flex items-center gap-2 px-3 py-1.5 text-sm text-muted-foreground bg-muted/50 rounded-md border border-border/50 hover-elevate active-elevate-2 transition-all"
@@ -167,10 +178,7 @@ export function CommandPaletteTrigger() {
       data-testid="button-command-palette"
     >
       <Search className="h-4 w-4" />
-      <span className="hidden sm:inline">Search...</span>
-      <kbd className="hidden sm:inline-flex h-5 items-center gap-1 rounded border bg-background px-1.5 font-mono text-xs text-muted-foreground">
-        <span className="text-xs">⌘</span>K
-      </kbd>
+      <span className="hidden sm:inline">{t("search")}</span>
     </button>
   );
 }

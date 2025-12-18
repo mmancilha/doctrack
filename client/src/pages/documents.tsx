@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
+import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
-import { FileText, Plus, Search, Filter, Grid, List, X, Calendar } from "lucide-react";
+import { FileText, Search, X, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -17,24 +18,30 @@ import { EmptyState } from "@/components/empty-state";
 import { DocumentListSkeleton } from "@/components/loading-skeleton";
 import { Badge } from "@/components/ui/badge";
 import { queryClient, apiRequest } from "@/lib/queryClient";
-import { DOCUMENT_CATEGORIES, DOCUMENT_STATUSES } from "@/lib/constants";
+import { useDocumentCategories, useDocumentStatuses } from "@/lib/constants";
 import { useAuth } from "@/lib/auth";
 import type { Document } from "@shared/schema";
 
-const DATE_FILTERS = [
-  { value: "all", label: "All time" },
-  { value: "7days", label: "Last 7 days" },
-  { value: "30days", label: "Last 30 days" },
-  { value: "90days", label: "Last 90 days" },
-];
-
 export default function Documents() {
+  const { t } = useTranslation("documents");
+  const { t: tCommon } = useTranslation("common");
+  const { t: tDashboard } = useTranslation("dashboard");
   const [, setLocation] = useLocation();
   const { canEdit, canDelete } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [dateFilter, setDateFilter] = useState<string>("all");
+  
+  const DOCUMENT_CATEGORIES = useDocumentCategories();
+  const DOCUMENT_STATUSES = useDocumentStatuses();
+
+  const DATE_FILTERS = [
+    { value: "all", label: t("filters.allTime", "All time") },
+    { value: "7days", label: t("filters.last7Days", "Last 7 days") },
+    { value: "30days", label: t("filters.last30Days", "Last 30 days") },
+    { value: "90days", label: t("filters.last90Days", "Last 90 days") },
+  ];
 
   const { data: documents, isLoading } = useQuery<Document[]>({
     queryKey: ["/api/documents"],
@@ -106,36 +113,22 @@ export default function Documents() {
 
   return (
     <div className="p-6 space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <motion.h1
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-2xl font-bold tracking-tight"
-          >
-            All Documents
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.1 }}
-            className="text-sm text-muted-foreground"
-          >
-            Browse and manage all your documentation
-          </motion.p>
-        </div>
-        {canEdit && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2 }}
-          >
-            <Button onClick={() => setLocation("/new")} data-testid="button-create-document">
-              <Plus className="mr-2 h-4 w-4" />
-              New Document
-            </Button>
-          </motion.div>
-        )}
+      <div>
+        <motion.h1
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-2xl font-bold tracking-tight"
+        >
+          {t("list.title")}
+        </motion.h1>
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.1 }}
+          className="text-sm text-muted-foreground"
+        >
+          {t("list.description")}
+        </motion.p>
       </div>
 
       <motion.div
@@ -147,7 +140,7 @@ export default function Documents() {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search documents..."
+            placeholder={t("list.search")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-9"
@@ -157,10 +150,10 @@ export default function Documents() {
         <div className="flex gap-2">
           <Select value={categoryFilter} onValueChange={setCategoryFilter}>
             <SelectTrigger className="w-[140px]" data-testid="select-category">
-              <SelectValue placeholder="Category" />
+              <SelectValue placeholder={t("editor.category")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Categories</SelectItem>
+              <SelectItem value="all">{t("filters.allCategories", "All Categories")}</SelectItem>
               {DOCUMENT_CATEGORIES.map((cat) => (
                 <SelectItem key={cat.value} value={cat.value}>
                   {cat.label}
@@ -170,10 +163,10 @@ export default function Documents() {
           </Select>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-[130px]" data-testid="select-status">
-              <SelectValue placeholder="Status" />
+              <SelectValue placeholder={t("editor.status")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Statuses</SelectItem>
+              <SelectItem value="all">{t("filters.allStatuses", "All Statuses")}</SelectItem>
               {DOCUMENT_STATUSES.map((status) => (
                 <SelectItem key={status.value} value={status.value}>
                   {status.label}
@@ -184,7 +177,7 @@ export default function Documents() {
           <Select value={dateFilter} onValueChange={setDateFilter}>
             <SelectTrigger className="w-[130px]" data-testid="select-date">
               <Calendar className="h-4 w-4 mr-2" />
-              <SelectValue placeholder="Date" />
+              <SelectValue placeholder={t("filters.date", "Date")} />
             </SelectTrigger>
             <SelectContent>
               {DATE_FILTERS.map((filter) => (
@@ -203,10 +196,10 @@ export default function Documents() {
           animate={{ opacity: 1, height: "auto" }}
           className="flex items-center gap-2 flex-wrap"
         >
-          <span className="text-sm text-muted-foreground">Active filters:</span>
+          <span className="text-sm text-muted-foreground">{t("filters.activeFilters", "Active filters")}:</span>
           {searchQuery && (
             <Badge variant="secondary" className="gap-1">
-              Search: {searchQuery}
+              {t("filters.search", "Search")}: {searchQuery}
               <button onClick={() => setSearchQuery("")}>
                 <X className="h-3 w-3" />
               </button>
@@ -214,7 +207,7 @@ export default function Documents() {
           )}
           {categoryFilter !== "all" && (
             <Badge variant="secondary" className="gap-1">
-              Category: {categoryFilter}
+              {t("editor.category")}: {categoryFilter}
               <button onClick={() => setCategoryFilter("all")}>
                 <X className="h-3 w-3" />
               </button>
@@ -222,7 +215,7 @@ export default function Documents() {
           )}
           {statusFilter !== "all" && (
             <Badge variant="secondary" className="gap-1">
-              Status: {statusFilter}
+              {t("editor.status")}: {statusFilter}
               <button onClick={() => setStatusFilter("all")}>
                 <X className="h-3 w-3" />
               </button>
@@ -230,14 +223,14 @@ export default function Documents() {
           )}
           {dateFilter !== "all" && (
             <Badge variant="secondary" className="gap-1">
-              Date: {DATE_FILTERS.find(f => f.value === dateFilter)?.label}
+              {t("filters.date", "Date")}: {DATE_FILTERS.find(f => f.value === dateFilter)?.label}
               <button onClick={() => setDateFilter("all")}>
                 <X className="h-3 w-3" />
               </button>
             </Badge>
           )}
           <Button variant="ghost" size="sm" onClick={clearFilters} data-testid="button-clear-filters">
-            Clear all
+            {t("filters.clearAll", "Clear all")}
           </Button>
         </motion.div>
       )}
@@ -245,23 +238,23 @@ export default function Documents() {
       {filteredDocuments.length === 0 ? (
         <EmptyState
           icon={FileText}
-          title={hasActiveFilters ? "No matching documents" : "No documents yet"}
+          title={hasActiveFilters ? t("list.empty.title") : tDashboard("empty.title")}
           description={
             hasActiveFilters
-              ? "Try adjusting your filters or search query."
-              : canEdit ? "Create your first document to get started." : "No documents are available yet."
+              ? t("list.empty.description")
+              : canEdit ? tDashboard("empty.descriptionEditor") : tDashboard("empty.descriptionReader")
           }
           action={
             hasActiveFilters
-              ? { label: "Clear Filters", onClick: clearFilters }
-              : canEdit ? { label: "Create Document", onClick: () => setLocation("/new") } : undefined
+              ? { label: t("filters.clearAll", "Clear Filters"), onClick: clearFilters }
+              : canEdit ? { label: tDashboard("empty.action"), onClick: () => setLocation("/new") } : undefined
           }
         />
       ) : (
         <>
           <div className="flex items-center justify-between">
             <p className="text-sm text-muted-foreground">
-              Showing {filteredDocuments.length} document{filteredDocuments.length !== 1 ? "s" : ""}
+              {t("filters.showing", "Showing")} {filteredDocuments.length} {filteredDocuments.length !== 1 ? t("filters.documents", "documents") : t("filters.document", "document")}
             </p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

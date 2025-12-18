@@ -10,8 +10,9 @@ export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
-  app.get("/api/documents", async (req, res) => {
+  app.get("/api/documents", requireAuth, async (req, res) => {
     try {
+      const user = req.user!;
       const { query, category, status, authorId } = req.query;
       
       if (query || category || status || authorId) {
@@ -21,10 +22,10 @@ export async function registerRoutes(
           status: status as string,
           authorId: authorId as string,
         });
-        const documents = await storage.searchDocuments(searchQuery);
+        const documents = await storage.searchDocuments(searchQuery, user);
         res.json(documents);
       } else {
-        const documents = await storage.getDocuments();
+        const documents = await storage.getDocuments(user);
         res.json(documents);
       }
     } catch (error) {
@@ -33,11 +34,12 @@ export async function registerRoutes(
     }
   });
 
-  app.get("/api/documents/:id", async (req, res) => {
+  app.get("/api/documents/:id", requireAuth, async (req, res) => {
     try {
-      const document = await storage.getDocument(req.params.id);
+      const user = req.user!;
+      const document = await storage.getDocument(req.params.id, user);
       if (!document) {
-        return res.status(404).json({ error: "Document not found" });
+        return res.status(404).json({ error: "Document not found or access denied" });
       }
       res.json(document);
     } catch (error) {
@@ -77,9 +79,9 @@ export async function registerRoutes(
   app.patch("/api/documents/:id", canEditDocuments, async (req, res) => {
     try {
       const user = req.user!;
-      const existingDoc = await storage.getDocument(req.params.id);
+      const existingDoc = await storage.getDocument(req.params.id, user);
       if (!existingDoc) {
-        return res.status(404).json({ error: "Document not found" });
+        return res.status(404).json({ error: "Document not found or access denied" });
       }
 
       const partialSchema = insertDocumentSchema.partial();
@@ -114,9 +116,9 @@ export async function registerRoutes(
   app.delete("/api/documents/:id", canDeleteDocuments, async (req, res) => {
     try {
       const user = req.user!;
-      const document = await storage.getDocument(req.params.id);
+      const document = await storage.getDocument(req.params.id, user);
       if (!document) {
-        return res.status(404).json({ error: "Document not found" });
+        return res.status(404).json({ error: "Document not found or access denied" });
       }
 
       await storage.createAuditLog({
@@ -139,11 +141,12 @@ export async function registerRoutes(
     }
   });
 
-  app.get("/api/documents/:id/versions", async (req, res) => {
+  app.get("/api/documents/:id/versions", requireAuth, async (req, res) => {
     try {
-      const document = await storage.getDocument(req.params.id);
+      const user = req.user!;
+      const document = await storage.getDocument(req.params.id, user);
       if (!document) {
-        return res.status(404).json({ error: "Document not found" });
+        return res.status(404).json({ error: "Document not found or access denied" });
       }
 
       const versions = await storage.getVersions(req.params.id);
@@ -167,11 +170,12 @@ export async function registerRoutes(
     }
   });
 
-  app.post("/api/documents/:id/export-pdf", async (req, res) => {
+  app.post("/api/documents/:id/export-pdf", requireAuth, async (req, res) => {
     try {
-      const document = await storage.getDocument(req.params.id);
+      const user = req.user!;
+      const document = await storage.getDocument(req.params.id, user);
       if (!document) {
-        return res.status(404).json({ error: "Document not found" });
+        return res.status(404).json({ error: "Document not found or access denied" });
       }
 
       const { versionId } = req.body as { versionId?: string };
@@ -275,11 +279,12 @@ export async function registerRoutes(
     }
   });
 
-  app.get("/api/documents/:id/comments", async (req, res) => {
+  app.get("/api/documents/:id/comments", requireAuth, async (req, res) => {
     try {
-      const document = await storage.getDocument(req.params.id);
+      const user = req.user!;
+      const document = await storage.getDocument(req.params.id, user);
       if (!document) {
-        return res.status(404).json({ error: "Document not found" });
+        return res.status(404).json({ error: "Document not found or access denied" });
       }
 
       const comments = await storage.getComments(req.params.id);
@@ -298,9 +303,10 @@ export async function registerRoutes(
 
   app.post("/api/documents/:id/comments", requireAuth, async (req, res) => {
     try {
-      const document = await storage.getDocument(req.params.id);
+      const user = req.user!;
+      const document = await storage.getDocument(req.params.id, user);
       if (!document) {
-        return res.status(404).json({ error: "Document not found" });
+        return res.status(404).json({ error: "Document not found or access denied" });
       }
 
       const validationResult = commentSchema.safeParse(req.body);
@@ -309,7 +315,6 @@ export async function registerRoutes(
       }
 
       const { content, sectionId, sectionText } = validationResult.data;
-      const user = req.user!;
       const comment = await storage.createComment({
         documentId: req.params.id,
         authorId: user.id,

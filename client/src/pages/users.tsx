@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
+import { useTranslation } from "react-i18next";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
-import { Users, Plus, Trash2, Shield, Edit2, UserCog, Eye, Pencil, Save, X, ShieldAlert } from "lucide-react";
+import { Users, Plus, Trash2, Shield, Edit2, UserCog, Eye, Pencil, ShieldAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,6 +24,8 @@ interface UserData {
 }
 
 export default function UsersPage() {
+  const { t } = useTranslation("admin");
+  const { t: tCommon } = useTranslation("common");
   const { user: currentUser } = useAuth();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
@@ -36,10 +39,9 @@ export default function UsersPage() {
 
   const isAdmin = currentUser?.role === "admin";
 
-  // All hooks must be called before early returns
   const { data: users = [], isLoading } = useQuery<UserData[]>({
     queryKey: ["/api/users"],
-    enabled: isAdmin, // Only fetch if admin
+    enabled: isAdmin,
   });
 
   const createUser = useMutation({
@@ -53,10 +55,10 @@ export default function UsersPage() {
       setNewUsername("");
       setNewPassword("");
       setNewRole("reader");
-      toast({ title: "User created", description: "New user has been created successfully." });
+      toast({ title: t("users.toast.created.title"), description: t("users.toast.created.description") });
     },
     onError: (error: any) => {
-      toast({ title: "Error", description: error.message || "Failed to create user.", variant: "destructive" });
+      toast({ title: tCommon("errors.generic"), description: error.message || t("users.toast.error.create"), variant: "destructive" });
     },
   });
 
@@ -73,10 +75,10 @@ export default function UsersPage() {
       setEditingUser(null);
       setEditRole("");
       setEditPassword("");
-      toast({ title: "User updated", description: "User has been updated successfully." });
+      toast({ title: t("users.toast.updated.title"), description: t("users.toast.updated.description") });
     },
     onError: () => {
-      toast({ title: "Error", description: "Failed to update user.", variant: "destructive" });
+      toast({ title: tCommon("errors.generic"), description: t("users.toast.error.update"), variant: "destructive" });
     },
   });
 
@@ -87,16 +89,16 @@ export default function UsersPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/users"] });
-      toast({ title: "User deleted", description: "User has been deleted successfully." });
+      toast({ title: t("users.toast.deleted.title"), description: t("users.toast.deleted.description") });
     },
     onError: (error: any) => {
-      toast({ title: "Error", description: error.message || "Failed to delete user.", variant: "destructive" });
+      toast({ title: tCommon("errors.generic"), description: error.message || t("users.toast.error.delete"), variant: "destructive" });
     },
   });
 
   const handleCreate = () => {
     if (!newUsername.trim() || !newPassword.trim()) {
-      toast({ title: "Error", description: "Username and password are required.", variant: "destructive" });
+      toast({ title: tCommon("errors.generic"), description: t("users.toast.error.required"), variant: "destructive" });
       return;
     }
     createUser.mutate({ username: newUsername, password: newPassword, role: newRole });
@@ -105,7 +107,7 @@ export default function UsersPage() {
   const handleUpdate = () => {
     if (!editingUser) return;
     if (!editRole && !editPassword) {
-      toast({ title: "Error", description: "Please provide a role or password to update.", variant: "destructive" });
+      toast({ title: tCommon("errors.generic"), description: t("users.toast.error.noChanges"), variant: "destructive" });
       return;
     }
     updateUser.mutate({ 
@@ -131,7 +133,14 @@ export default function UsersPage() {
     }
   };
 
-  // Guard: Only admins can access this page
+  const getRoleLabel = (role: string) => {
+    switch (role) {
+      case "admin": return tCommon("roles.admin");
+      case "editor": return tCommon("roles.editor");
+      default: return tCommon("roles.reader");
+    }
+  };
+
   if (!isAdmin) {
     return (
       <div className="h-full flex items-center justify-center">
@@ -142,13 +151,13 @@ export default function UsersPage() {
                 <ShieldAlert className="h-8 w-8 text-destructive" />
               </div>
               <div>
-                <h2 className="text-xl font-semibold">Access Denied</h2>
+                <h2 className="text-xl font-semibold">{t("users.accessDenied.title")}</h2>
                 <p className="text-muted-foreground mt-2">
-                  Only administrators can access user management.
+                  {t("users.accessDenied.description")}
                 </p>
               </div>
               <Button onClick={() => setLocation("/")} variant="outline">
-                Go to Dashboard
+                {tCommon("buttons.goToDashboard")}
               </Button>
             </div>
           </CardContent>
@@ -160,7 +169,7 @@ export default function UsersPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-full">
-        <p className="text-muted-foreground">Loading users...</p>
+        <p className="text-muted-foreground">{t("users.loadingUsers")}</p>
       </div>
     );
   }
@@ -174,8 +183,8 @@ export default function UsersPage() {
               <UserCog className="h-5 w-5 text-primary" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold" data-testid="text-page-title">User Management</h1>
-              <p className="text-sm text-muted-foreground">Manage user accounts and permissions</p>
+              <h1 className="text-2xl font-bold" data-testid="text-page-title">{t("users.title")}</h1>
+              <p className="text-sm text-muted-foreground">{t("users.description")}</p>
             </div>
           </div>
 
@@ -183,58 +192,58 @@ export default function UsersPage() {
             <DialogTrigger asChild>
               <Button data-testid="button-create-user">
                 <Plus className="mr-2 h-4 w-4" />
-                Add User
+                {t("users.addUser")}
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Create New User</DialogTitle>
+                <DialogTitle>{t("users.create.title")}</DialogTitle>
                 <DialogDescription>
-                  Add a new user to the system. They will be able to log in with these credentials.
+                  {t("users.create.description")}
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4 py-4">
                 <div className="space-y-2">
-                  <Label htmlFor="username">Username</Label>
+                  <Label htmlFor="username">{t("users.create.username")}</Label>
                   <Input
                     id="username"
                     data-testid="input-new-username"
                     value={newUsername}
                     onChange={(e) => setNewUsername(e.target.value)}
-                    placeholder="Enter username"
+                    placeholder={t("users.create.usernamePlaceholder")}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
+                  <Label htmlFor="password">{t("users.create.password")}</Label>
                   <Input
                     id="password"
                     data-testid="input-new-password"
                     type="password"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="Enter password"
+                    placeholder={t("users.create.passwordPlaceholder")}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="role">Role</Label>
+                  <Label htmlFor="role">{t("users.create.role")}</Label>
                   <Select value={newRole} onValueChange={setNewRole}>
                     <SelectTrigger data-testid="select-new-role">
-                      <SelectValue placeholder="Select role" />
+                      <SelectValue placeholder={t("users.create.role")} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="reader">Reader - Can view documents</SelectItem>
-                      <SelectItem value="editor">Editor - Can edit documents</SelectItem>
-                      <SelectItem value="admin">Admin - Full access</SelectItem>
+                      <SelectItem value="reader">{t("users.create.roleReader")}</SelectItem>
+                      <SelectItem value="editor">{t("users.create.roleEditor")}</SelectItem>
+                      <SelectItem value="admin">{t("users.create.roleAdmin")}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               </div>
               <DialogFooter>
                 <Button variant="outline" onClick={() => setIsCreateOpen(false)}>
-                  Cancel
+                  {tCommon("buttons.cancel")}
                 </Button>
                 <Button onClick={handleCreate} disabled={createUser.isPending} data-testid="button-submit-create">
-                  {createUser.isPending ? "Creating..." : "Create User"}
+                  {createUser.isPending ? t("users.create.creating") : t("users.create.submit")}
                 </Button>
               </DialogFooter>
             </DialogContent>
@@ -245,10 +254,10 @@ export default function UsersPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Users className="h-5 w-5" />
-              All Users ({users.length})
+              {t("users.allUsers")} ({users.length})
             </CardTitle>
             <CardDescription>
-              Users with access to DocTrack
+              {t("users.usersWithAccess")}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -273,7 +282,7 @@ export default function UsersPage() {
                         <p className="font-medium" data-testid={`text-username-${user.id}`}>{user.username}</p>
                         <Badge variant={getRoleBadgeVariant(user.role)} className="mt-1">
                           {getRoleIcon(user.role)}
-                          <span className="ml-1 capitalize">{user.role}</span>
+                          <span className="ml-1">{getRoleLabel(user.role)}</span>
                         </Badge>
                       </div>
                     </div>
@@ -303,43 +312,43 @@ export default function UsersPage() {
                             </DialogTrigger>
                             <DialogContent>
                               <DialogHeader>
-                                <DialogTitle>Edit User: {user.username}</DialogTitle>
+                                <DialogTitle>{t("users.edit.title", { username: user.username })}</DialogTitle>
                                 <DialogDescription>
-                                  Update role or reset password for this user.
+                                  {t("users.edit.description")}
                                 </DialogDescription>
                               </DialogHeader>
                               <div className="space-y-4 py-4">
                                 <div className="space-y-2">
-                                  <Label htmlFor="edit-role">Role</Label>
+                                  <Label htmlFor="edit-role">{t("users.edit.role")}</Label>
                                   <Select value={editRole} onValueChange={setEditRole}>
                                     <SelectTrigger data-testid="select-edit-role">
-                                      <SelectValue placeholder="Select role" />
+                                      <SelectValue placeholder={t("users.edit.role")} />
                                     </SelectTrigger>
                                     <SelectContent>
-                                      <SelectItem value="reader">Reader</SelectItem>
-                                      <SelectItem value="editor">Editor</SelectItem>
-                                      <SelectItem value="admin">Admin</SelectItem>
+                                      <SelectItem value="reader">{tCommon("roles.reader")}</SelectItem>
+                                      <SelectItem value="editor">{tCommon("roles.editor")}</SelectItem>
+                                      <SelectItem value="admin">{tCommon("roles.admin")}</SelectItem>
                                     </SelectContent>
                                   </Select>
                                 </div>
                                 <div className="space-y-2">
-                                  <Label htmlFor="edit-password">New Password (optional)</Label>
+                                  <Label htmlFor="edit-password">{t("users.edit.newPassword")}</Label>
                                   <Input
                                     id="edit-password"
                                     data-testid="input-edit-password"
                                     type="password"
                                     value={editPassword}
                                     onChange={(e) => setEditPassword(e.target.value)}
-                                    placeholder="Leave blank to keep current password"
+                                    placeholder={t("users.edit.newPasswordPlaceholder")}
                                   />
                                 </div>
                               </div>
                               <DialogFooter>
                                 <Button variant="outline" onClick={() => setEditingUser(null)}>
-                                  Cancel
+                                  {tCommon("buttons.cancel")}
                                 </Button>
                                 <Button onClick={handleUpdate} disabled={updateUser.isPending} data-testid="button-submit-edit">
-                                  {updateUser.isPending ? "Saving..." : "Save Changes"}
+                                  {updateUser.isPending ? t("users.edit.saving") : t("users.edit.submit")}
                                 </Button>
                               </DialogFooter>
                             </DialogContent>
@@ -353,19 +362,19 @@ export default function UsersPage() {
                             </AlertDialogTrigger>
                             <AlertDialogContent>
                               <AlertDialogHeader>
-                                <AlertDialogTitle>Delete User</AlertDialogTitle>
+                                <AlertDialogTitle>{t("users.delete.title")}</AlertDialogTitle>
                                 <AlertDialogDescription>
-                                  Are you sure you want to delete "{user.username}"? This action cannot be undone.
+                                  {t("users.delete.description", { username: user.username })}
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
                               <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogCancel>{tCommon("buttons.cancel")}</AlertDialogCancel>
                                 <AlertDialogAction
                                   onClick={() => deleteUser.mutate(user.id)}
                                   className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                                   data-testid={`button-confirm-delete-${user.id}`}
                                 >
-                                  Delete
+                                  {tCommon("buttons.delete")}
                                 </AlertDialogAction>
                               </AlertDialogFooter>
                             </AlertDialogContent>
@@ -373,7 +382,7 @@ export default function UsersPage() {
                         </>
                       )}
                       {user.id === currentUser?.id && (
-                        <Badge variant="outline" className="text-xs">You</Badge>
+                        <Badge variant="outline" className="text-xs">{t("users.you")}</Badge>
                       )}
                     </div>
                   </motion.div>

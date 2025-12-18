@@ -1,5 +1,6 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation, useParams } from "wouter";
+import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { BookOpen, CheckSquare, FileCheck, FileText, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -8,39 +9,27 @@ import { EmptyState } from "@/components/empty-state";
 import { DocumentListSkeleton } from "@/components/loading-skeleton";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/lib/auth";
-import type { Document, DocumentCategory } from "@shared/schema";
+import { useCategoryLabels } from "@/lib/constants";
+import type { Document } from "@shared/schema";
 
-const categoryConfig: Record<
-  string,
-  { title: string; description: string; icon: typeof FileText }
-> = {
-  manual: {
-    title: "Manuals",
-    description: "Technical documentation and user guides",
-    icon: BookOpen,
-  },
-  checklist: {
-    title: "Checklists",
-    description: "Step-by-step procedures and verification lists",
-    icon: CheckSquare,
-  },
-  guide: {
-    title: "Guides",
-    description: "How-to articles and tutorials",
-    icon: FileCheck,
-  },
+const categoryIcons: Record<string, typeof FileText> = {
+  manual: BookOpen,
+  checklist: CheckSquare,
+  guide: FileCheck,
 };
 
 export default function Category() {
+  const { t } = useTranslation("documents");
+  const { t: tCommon } = useTranslation("common");
+  const { t: tDashboard } = useTranslation("dashboard");
   const { category } = useParams<{ category: string }>();
   const [, setLocation] = useLocation();
   const { canEdit, canDelete } = useAuth();
+  const categoryLabels = useCategoryLabels();
 
-  const config = categoryConfig[category || ""] || {
-    title: "Documents",
-    description: "All documents",
-    icon: FileText,
-  };
+  const categoryKey = category as keyof typeof categoryLabels;
+  const labels = categoryLabels[categoryKey] || { singular: tCommon("categories.guide"), plural: tCommon("categories.guides") };
+  const Icon = categoryIcons[category || ""] || FileText;
 
   const { data: documents, isLoading } = useQuery<Document[]>({
     queryKey: ["/api/documents"],
@@ -65,8 +54,6 @@ export default function Category() {
     );
   }
 
-  const Icon = config.icon;
-
   return (
     <div className="p-6 space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -84,7 +71,7 @@ export default function Category() {
               animate={{ opacity: 1, y: 0 }}
               className="text-2xl font-bold tracking-tight"
             >
-              {config.title}
+              {labels.plural}
             </motion.h1>
             <motion.p
               initial={{ opacity: 0 }}
@@ -92,7 +79,7 @@ export default function Category() {
               transition={{ delay: 0.1 }}
               className="text-sm text-muted-foreground"
             >
-              {config.description}
+              {t("category.description", { category: labels.plural.toLowerCase() })}
             </motion.p>
           </div>
         </div>
@@ -102,9 +89,9 @@ export default function Category() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2 }}
           >
-            <Button onClick={() => setLocation("/new")} data-testid="button-create-document">
+            <Button onClick={() => setLocation(`/new?category=${category}`)} data-testid="button-create-document">
               <Plus className="mr-2 h-4 w-4" />
-              New {config.title.slice(0, -1)}
+              {tCommon("buttons.create")} {labels.singular}
             </Button>
           </motion.div>
         )}
@@ -113,17 +100,20 @@ export default function Category() {
       {filteredDocuments.length === 0 ? (
         <EmptyState
           icon={Icon}
-          title={`No ${config.title.toLowerCase()} yet`}
-          description={canEdit ? `Create your first ${config.title.toLowerCase().slice(0, -1)} to get started.` : `No ${config.title.toLowerCase()} are available yet.`}
+          title={t("category.empty.title", { category: labels.plural.toLowerCase() })}
+          description={canEdit 
+            ? t("category.empty.description", { singular: labels.singular.toLowerCase() })
+            : tDashboard("empty.descriptionReader")
+          }
           action={canEdit ? {
-            label: `Create ${config.title.slice(0, -1)}`,
-            onClick: () => setLocation("/new"),
+            label: `${tCommon("buttons.create")} ${labels.singular}`,
+            onClick: () => setLocation(`/new?category=${category}`),
           } : undefined}
         />
       ) : (
         <>
           <p className="text-sm text-muted-foreground">
-            {filteredDocuments.length} document{filteredDocuments.length !== 1 ? "s" : ""}
+            {filteredDocuments.length} {filteredDocuments.length !== 1 ? t("filters.documents") : t("filters.document")}
           </p>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {filteredDocuments.map((doc, index) => (

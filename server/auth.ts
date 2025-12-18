@@ -14,6 +14,7 @@ declare global {
       id: string;
       username: string;
       role: string;
+      displayName: string | null;
       avatarUrl: string | null;
     }
   }
@@ -60,6 +61,7 @@ export function setupAuth(app: Express) {
           id: user.id,
           username: user.username,
           role: user.role,
+          displayName: user.displayName,
           avatarUrl: user.avatarUrl,
         });
       } catch (error) {
@@ -82,6 +84,7 @@ export function setupAuth(app: Express) {
         id: user.id,
         username: user.username,
         role: user.role,
+        displayName: user.displayName,
         avatarUrl: user.avatarUrl,
       });
     } catch (error) {
@@ -105,6 +108,7 @@ export function setupAuth(app: Express) {
           id: user.id,
           username: user.username,
           role: user.role,
+          displayName: user.displayName,
           avatarUrl: user.avatarUrl,
         });
       });
@@ -127,6 +131,78 @@ export function setupAuth(app: Express) {
     res.json(req.user);
   });
 
+  // Atualizar perfil do usuário logado
+  app.patch("/api/auth/profile", requireAuth, async (req, res) => {
+    try {
+      const { displayName, avatarUrl } = req.body;
+      const userId = req.user!.id;
+
+      const updates: { displayName?: string; avatarUrl?: string | null } = {};
+      
+      if (displayName !== undefined) {
+        if (typeof displayName === "string" && displayName.trim().length > 0 && displayName.length <= 100) {
+          updates.displayName = displayName.trim();
+        } else if (displayName === "" || displayName === null) {
+          updates.displayName = undefined;
+        }
+      }
+      
+      if (avatarUrl !== undefined) {
+        if (avatarUrl === null || avatarUrl === "") {
+          updates.avatarUrl = null;
+        } else if (typeof avatarUrl === "string") {
+          // Aceita URLs base64 (data:image/...) ou URLs normais
+          if (avatarUrl.startsWith("data:image/")) {
+            // Validar tamanho máximo (~2MB em base64)
+            if (avatarUrl.length > 3 * 1024 * 1024) {
+              return res.status(400).json({ error: "Image too large (max 2MB)" });
+            }
+            updates.avatarUrl = avatarUrl;
+          } else {
+            // Validação de URL normal
+            try {
+              new URL(avatarUrl);
+              updates.avatarUrl = avatarUrl;
+            } catch {
+              return res.status(400).json({ error: "Invalid avatar URL" });
+            }
+          }
+        }
+      }
+
+      if (Object.keys(updates).length === 0) {
+        return res.status(400).json({ error: "No valid updates provided" });
+      }
+
+      const user = await storage.updateUser(userId, updates);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      // Atualizar a sessão com os novos dados (aguardar conclusão)
+      const updatedUserData = {
+        id: user.id,
+        username: user.username,
+        role: user.role,
+        displayName: user.displayName,
+        avatarUrl: user.avatarUrl,
+      };
+
+      req.login(updatedUserData, (err) => {
+        if (err) {
+          console.error("Error updating session:", err);
+          return res.status(500).json({ error: "Failed to update session" });
+        }
+        
+        // Só envia a resposta após o login ser atualizado
+        res.json(updatedUserData);
+      });
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      res.status(500).json({ error: "Failed to update profile" });
+    }
+  });
+
   app.get("/api/users", requireAuth, requireRole(["admin"]), async (req, res) => {
     try {
       const users = await storage.getUsers();
@@ -134,6 +210,7 @@ export function setupAuth(app: Express) {
         id: u.id,
         username: u.username,
         role: u.role,
+        displayName: u.displayName,
         avatarUrl: u.avatarUrl,
       })));
     } catch (error) {
@@ -164,6 +241,7 @@ export function setupAuth(app: Express) {
         id: user.id,
         username: user.username,
         role: user.role,
+        displayName: user.displayName,
         avatarUrl: user.avatarUrl,
       });
     } catch (error) {
@@ -197,6 +275,7 @@ export function setupAuth(app: Express) {
         id: user.id,
         username: user.username,
         role: user.role,
+        displayName: user.displayName,
         avatarUrl: user.avatarUrl,
       });
     } catch (error) {

@@ -9,6 +9,7 @@ import { TableCell } from "@tiptap/extension-table-cell";
 import { TableHeader } from "@tiptap/extension-table-header";
 import { Placeholder } from "@tiptap/extension-placeholder";
 import { useCallback, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import {
   Bold,
@@ -48,9 +49,12 @@ interface RichTextEditorProps {
 export function RichTextEditor({
   content,
   onChange,
-  placeholder = "Start writing your document...",
+  placeholder,
   editable = true,
 }: RichTextEditorProps) {
+  const { t } = useTranslation("documents");
+  const effectivePlaceholder = placeholder || t("editor.contentPlaceholder");
+  
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -88,7 +92,7 @@ export function RichTextEditor({
         },
       }),
       Placeholder.configure({
-        placeholder,
+        placeholder: effectivePlaceholder,
       }),
     ],
     content,
@@ -112,19 +116,19 @@ export function RichTextEditor({
 
   const addLink = useCallback(() => {
     if (!editor) return;
-    const url = window.prompt("Enter URL:");
+    const url = window.prompt(t("richEditor.promptUrl"));
     if (url) {
       editor.chain().focus().setLink({ href: url }).run();
     }
-  }, [editor]);
+  }, [editor, t]);
 
   const addImage = useCallback(() => {
     if (!editor) return;
-    const url = window.prompt("Enter image URL:");
+    const url = window.prompt(t("richEditor.promptImageUrl"));
     if (url) {
       editor.chain().focus().setImage({ src: url }).run();
     }
-  }, [editor]);
+  }, [editor, t]);
 
   const insertTable = useCallback(() => {
     if (!editor) return;
@@ -134,7 +138,7 @@ export function RichTextEditor({
   if (!editor) {
     return (
       <div className="border rounded-lg bg-card p-4 min-h-[500px] flex items-center justify-center">
-        <div className="animate-pulse text-muted-foreground">Loading editor...</div>
+        <div className="animate-pulse text-muted-foreground">{t("richEditor.loading")}</div>
       </div>
     );
   }
@@ -152,14 +156,14 @@ export function RichTextEditor({
               icon={Undo}
               onClick={() => editor.chain().focus().undo().run()}
               disabled={!editor.can().undo()}
-              tooltip="Undo"
+              tooltip={t("richEditor.undo")}
               testId="button-undo"
             />
             <ToolbarButton
               icon={Redo}
               onClick={() => editor.chain().focus().redo().run()}
               disabled={!editor.can().redo()}
-              tooltip="Redo"
+              tooltip={t("richEditor.redo")}
               testId="button-redo"
             />
           </div>
@@ -171,21 +175,21 @@ export function RichTextEditor({
               icon={Heading1}
               onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
               isActive={editor.isActive("heading", { level: 1 })}
-              tooltip="Heading 1"
+              tooltip={t("richEditor.heading1")}
               testId="button-h1"
             />
             <ToolbarButton
               icon={Heading2}
               onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
               isActive={editor.isActive("heading", { level: 2 })}
-              tooltip="Heading 2"
+              tooltip={t("richEditor.heading2")}
               testId="button-h2"
             />
             <ToolbarButton
               icon={Heading3}
               onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
               isActive={editor.isActive("heading", { level: 3 })}
-              tooltip="Heading 3"
+              tooltip={t("richEditor.heading3")}
               testId="button-h3"
             />
           </div>
@@ -197,35 +201,35 @@ export function RichTextEditor({
               icon={Bold}
               onClick={() => editor.chain().focus().toggleBold().run()}
               isActive={editor.isActive("bold")}
-              tooltip="Bold (⌘B)"
+              tooltip={`${t("richEditor.bold")} (⌘B)`}
               testId="button-bold"
             />
             <ToolbarButton
               icon={Italic}
               onClick={() => editor.chain().focus().toggleItalic().run()}
               isActive={editor.isActive("italic")}
-              tooltip="Italic (⌘I)"
+              tooltip={`${t("richEditor.italic")} (⌘I)`}
               testId="button-italic"
             />
             <ToolbarButton
               icon={UnderlineIcon}
               onClick={() => editor.chain().focus().toggleUnderline().run()}
               isActive={editor.isActive("underline")}
-              tooltip="Underline (⌘U)"
+              tooltip={`${t("richEditor.underline")} (⌘U)`}
               testId="button-underline"
             />
             <ToolbarButton
               icon={Strikethrough}
               onClick={() => editor.chain().focus().toggleStrike().run()}
               isActive={editor.isActive("strike")}
-              tooltip="Strikethrough"
+              tooltip={t("richEditor.strikethrough")}
               testId="button-strike"
             />
             <ToolbarButton
               icon={Code}
               onClick={() => editor.chain().focus().toggleCode().run()}
               isActive={editor.isActive("code")}
-              tooltip="Code"
+              tooltip={t("richEditor.code")}
               testId="button-code"
             />
           </div>
@@ -237,27 +241,27 @@ export function RichTextEditor({
               icon={List}
               onClick={() => editor.chain().focus().toggleBulletList().run()}
               isActive={editor.isActive("bulletList")}
-              tooltip="Bullet List"
+              tooltip={t("richEditor.bulletList")}
               testId="button-bullet-list"
             />
             <ToolbarButton
               icon={ListOrdered}
               onClick={() => editor.chain().focus().toggleOrderedList().run()}
               isActive={editor.isActive("orderedList")}
-              tooltip="Ordered List"
+              tooltip={t("richEditor.orderedList")}
               testId="button-ordered-list"
             />
             <ToolbarButton
               icon={Quote}
               onClick={() => editor.chain().focus().toggleBlockquote().run()}
               isActive={editor.isActive("blockquote")}
-              tooltip="Quote"
+              tooltip={t("richEditor.quote")}
               testId="button-quote"
             />
             <ToolbarButton
               icon={Minus}
               onClick={() => editor.chain().focus().setHorizontalRule().run()}
-              tooltip="Horizontal Rule"
+              tooltip={t("richEditor.horizontalRule")}
               testId="button-hr"
             />
           </div>
@@ -269,19 +273,19 @@ export function RichTextEditor({
               icon={LinkIcon}
               onClick={addLink}
               isActive={editor.isActive("link")}
-              tooltip="Add Link"
+              tooltip={t("richEditor.addLink")}
               testId="button-link"
             />
             <ToolbarButton
               icon={ImageIcon}
               onClick={addImage}
-              tooltip="Add Image"
+              tooltip={t("richEditor.addImage")}
               testId="button-image"
             />
             <ToolbarButton
               icon={TableIcon}
               onClick={insertTable}
-              tooltip="Insert Table"
+              tooltip={t("richEditor.insertTable")}
               testId="button-table"
             />
           </div>
