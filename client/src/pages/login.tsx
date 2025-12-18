@@ -106,8 +106,9 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-100 via-slate-50 to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 p-4 pb-24">
-      <motion.div
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-100 via-slate-50 to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+      <div className="flex-1 flex items-center justify-center p-4 pb-24">
+        <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
@@ -240,7 +241,22 @@ export default function Login() {
             </form>
           </CardContent>
         </Card>
-      </motion.div>
+        </motion.div>
+      </div>
+      
+      <footer className="py-4 text-center text-xs text-muted-foreground">
+        Made with <span className="text-red-500">❤️</span> by{" "}
+        <a 
+          href="https://www.linkedin.com/in/mayconmancilha/" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="font-medium text-foreground hover:text-primary transition-colors"
+        >
+          Maycon Mancilha
+        </a>
+        <span className="mx-1">•</span>
+        <span className="text-muted-foreground/80">Software Engineer</span>
+      </footer>
     </div>
   );
 }

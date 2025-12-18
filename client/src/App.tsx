@@ -62,19 +62,6 @@ function AppLayout() {
             <main className="flex-1 overflow-auto">
               <Router />
             </main>
-            <footer className="border-t py-3 px-4 text-center text-xs text-muted-foreground bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-              Made with <span className="text-red-500">❤️</span> by{" "}
-              <a 
-                href="https://www.linkedin.com/in/mayconmancilha/" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="font-medium text-foreground hover:text-primary transition-colors"
-              >
-                Maycon Mancilha
-              </a>
-              <span className="mx-1">•</span>
-              <span className="text-muted-foreground/80">Software Engineer</span>
-            </footer>
           </div>
         </div>
       </SidebarProvider>
