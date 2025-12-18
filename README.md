@@ -52,6 +52,10 @@ DocTrack is a comprehensive document management solution designed for businesses
 
 ## 🛠 Tech Stack
 
+<table>
+<tr>
+<td valign="top">
+
 ### Frontend
 
 | Technology    | Purpose              |
@@ -65,6 +69,9 @@ DocTrack is a comprehensive document management solution designed for businesses
 | React Query   | Data Fetching        |
 | i18next       | Internationalization |
 
+</td>
+<td valign="top">
+
 ### Backend
 
 | Technology  | Purpose          |
@@ -75,6 +82,10 @@ DocTrack is a comprehensive document management solution designed for businesses
 | PostgreSQL  | Database         |
 | Passport.js | Authentication   |
 | bcrypt      | Password Hashing |
+
+</td>
+</tr>
+</table>
 
 ## 📸 Screenshots
 
