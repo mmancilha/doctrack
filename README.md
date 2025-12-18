@@ -12,7 +12,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=flat-square&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 
-[Features](#-features) • [Tech Stack](#-tech-stack) • [Getting Started](#-getting-started) • [Screenshots](#-screenshots) • [Author](#-author)
+[Features](#-features) • [Tech Stack](#-tech-stack) • [Screenshots](#-screenshots) • [Author](#-author)
 
 </div>
 
@@ -25,23 +25,27 @@ DocTrack is a comprehensive document management solution designed for businesses
 ## ✨ Features
 
 ### Document Management
+
 - 📝 **Rich Text Editor** - Full-featured WYSIWYG editor with formatting tools
 - 📂 **Smart Organization** - Categorize documents by type and client
 - 🔄 **Version History** - Track all changes with complete revision history
 - 🔍 **Version Comparison** - Visual diff between document versions
 
 ### Collaboration
+
 - 💬 **Comments System** - Add contextual comments to documents
 - 👥 **User Management** - Role-based access control (Admin, Editor, Reader)
 - 📊 **Audit Logs** - Complete activity tracking for compliance
 
 ### User Experience
+
 - 🌐 **Multi-language Support** - Available in English, Portuguese, and French
 - 🎨 **Modern UI** - Clean, responsive interface built with shadcn/ui
 - ⌨️ **Keyboard Shortcuts** - Command palette for power users (Ctrl+K)
 - 📤 **PDF Export** - Export documents to PDF format
 
 ### Enterprise Ready
+
 - 🔐 **Secure Authentication** - Session-based auth with Passport.js
 - 🏢 **Client Management** - Organize documents by client/company
 - 📈 **Dashboard Analytics** - Overview of document statistics
@@ -49,93 +53,42 @@ DocTrack is a comprehensive document management solution designed for businesses
 ## 🛠 Tech Stack
 
 ### Frontend
-| Technology | Purpose |
-|------------|---------|
-| React 18 | UI Framework |
-| TypeScript | Type Safety |
-| Tailwind CSS | Styling |
-| shadcn/ui | Component Library |
-| TipTap | Rich Text Editor |
-| Framer Motion | Animations |
-| React Query | Data Fetching |
-| i18next | Internationalization |
+
+| Technology    | Purpose              |
+| ------------- | -------------------- |
+| React 18      | UI Framework         |
+| TypeScript    | Type Safety          |
+| Tailwind CSS  | Styling              |
+| shadcn/ui     | Component Library    |
+| TipTap        | Rich Text Editor     |
+| Framer Motion | Animations           |
+| React Query   | Data Fetching        |
+| i18next       | Internationalization |
 
 ### Backend
-| Technology | Purpose |
-|------------|---------|
-| Node.js | Runtime |
-| Express | Web Framework |
-| Drizzle ORM | Database ORM |
-| PostgreSQL | Database |
-| Passport.js | Authentication |
-| bcrypt | Password Hashing |
 
-## 🚀 Getting Started
-
-### Prerequisites
-
-- Node.js 18+ 
-- PostgreSQL database (or [Neon](https://neon.tech) for serverless)
-
-### Installation
-
-1. **Clone the repository**
-```bash
-git clone https://github.com/mmancilha/doctrack.git
-cd doctrack
-```
-
-2. **Install dependencies**
-```bash
-npm install
-```
-
-3. **Configure environment**
-```bash
-# Create .env file with:
-DATABASE_URL=your_postgresql_connection_string
-SESSION_SECRET=your_session_secret
-```
-
-4. **Initialize database**
-```bash
-npm run db:push
-npm run db:seed
-```
-
-5. **Start development server**
-```bash
-npm run dev
-```
-
-The application will be available at `http://localhost:5001`
-
-### Default Users
-
-| Username | Password | Role |
-|----------|----------|------|
-| admin | admin123 | Administrator |
-| editor | editor123 | Editor |
-| reader | reader123 | Reader |
+| Technology  | Purpose          |
+| ----------- | ---------------- |
+| Node.js     | Runtime          |
+| Express     | Web Framework    |
+| Drizzle ORM | Database ORM     |
+| PostgreSQL  | Database         |
+| Passport.js | Authentication   |
+| bcrypt      | Password Hashing |
 
 ## 📸 Screenshots
 
-<details>
-<summary>Click to view screenshots</summary>
-
 ### Dashboard
+
 Modern dashboard with document statistics and recent activity.
 
+![Dashboard](docs/screenshots/doctrack-dashboard.png)
+
 ### Document Editor
-Full-featured rich text editor with formatting toolbar.
 
-### Version History
-Track and compare document versions over time.
+Full-featured rich text editor with client selection and category management.
 
-### Multi-language Support
-Switch between English, Portuguese, and French.
-
-</details>
+![Document Editor](docs/screenshots/doctrack-editor.png)
 
 ## 📁 Project Structure
 
@@ -174,6 +127,8 @@ doctrack/
 Copyright © 2024 Maycon Mancilha. All rights reserved.
 
 This software is proprietary and confidential. Unauthorized copying, modification, distribution, or use of this software, via any medium, is strictly prohibited without express written permission from the author.
+
+For licensing inquiries, please contact via [LinkedIn](https://www.linkedin.com/in/mayconmancilha/).
 
 ---
 
