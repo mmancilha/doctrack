@@ -1,3 +1,5 @@
+import doctrackIcon from "./images/doctrack-icon.svg";
+
 interface DocTrackLogoProps {
   className?: string;
   width?: number;
@@ -82,24 +84,28 @@ export function DocTrackLogo({ className, width = 280, height = 50 }: DocTrackLo
   );
 }
 
-// Logo com ícone para a página de login (ícone quadrado com elemento colorido + texto)
+// Logo com ícone SVG original para a página de login
 export function DocTrackLogoWithIcon({ className, width = 320, height = 60 }: DocTrackLogoProps) {
+  const iconSize = height * 0.85;
+  
   return (
-    <div className={`flex items-center gap-3 ${className || ''}`}>
-      {/* Ícone - quadrado com elemento decorativo */}
-      <svg width={height * 0.9} height={height * 0.9} viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-        {/* Quadrado principal */}
-        <rect x="5" y="5" width="40" height="40" rx="8" fill="currentColor" />
-        {/* Elemento decorativo - quadrado menor colorido */}
-        <rect x="5" y="5" width="20" height="20" rx="4" className="fill-primary" />
-      </svg>
+    <div className={`flex items-center gap-4 ${className || ''}`}>
+      {/* Ícone SVG original */}
+      <img 
+        src={doctrackIcon} 
+        alt="DocTrack Icon" 
+        width={iconSize} 
+        height={iconSize}
+        className="flex-shrink-0"
+      />
       
       {/* Texto DOCTRACK. */}
       <svg
-        width={width - height}
-        height={height * 0.6}
+        width={width - iconSize - 16}
+        height={height * 0.55}
         viewBox="0 0 175 27"
         preserveAspectRatio="xMidYMid meet"
+        className="flex-shrink-0"
       >
         <g fill="currentColor" fillOpacity="1">
           {/* D */}
@@ -145,21 +151,27 @@ export function DocTrackLogoWithIcon({ className, width = 320, height = 60 }: Do
 }
 
 // Logo compacta para sidebar (ícone + texto em uma linha)
-export function DocTrackLogoCompact({ className, width = 140, height = 32 }: DocTrackLogoProps) {
+export function DocTrackLogoCompact({ className, width = 160, height = 36 }: DocTrackLogoProps) {
+  const iconSize = height * 0.9;
+  
   return (
-    <div className={`flex items-center gap-2 ${className || ''}`}>
-      {/* Ícone pequeno */}
-      <svg width={height * 0.85} height={height * 0.85} viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="5" y="5" width="40" height="40" rx="8" fill="currentColor" />
-        <rect x="5" y="5" width="20" height="20" rx="4" className="fill-primary" />
-      </svg>
+    <div className={`flex items-center gap-3 ${className || ''}`}>
+      {/* Ícone SVG original */}
+      <img 
+        src={doctrackIcon} 
+        alt="DocTrack Icon" 
+        width={iconSize} 
+        height={iconSize}
+        className="flex-shrink-0"
+      />
       
       {/* Texto DOCTRACK. */}
       <svg
-        width={width - height}
-        height={height * 0.7}
+        width={width - iconSize - 12}
+        height={height * 0.65}
         viewBox="0 0 175 27"
         preserveAspectRatio="xMidYMid meet"
+        className="flex-shrink-0"
       >
         <g fill="currentColor" fillOpacity="1">
           <g transform="translate(0.631604, 20.855781)">
