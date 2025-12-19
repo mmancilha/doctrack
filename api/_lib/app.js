@@ -1,12 +1,14 @@
 // Helper compartilhado para inicializar o Express app
-// Usado por todos os handlers individuais
+// Usa serverless-http para adaptar Express para ambiente serverless
 
-let app = null;
+const serverless = require('serverless-http');
+
+let handler = null;
 let initPromise = null;
 
-async function getApp() {
-  if (app) {
-    return app;
+async function getHandler() {
+  if (handler) {
+    return handler;
   }
   
   if (!initPromise) {
@@ -20,16 +22,24 @@ async function getApp() {
         // Importa o servidor compilado
         const server = require('../../dist/index.cjs');
         
+        let expressApp;
         // Se o servidor exporta uma função de inicialização, chama ela
         if (server.initializeApp) {
           console.log('[App Helper] Calling initializeApp...');
-          app = await server.initializeApp();
+          expressApp = await server.initializeApp();
           console.log('[App Helper] App initialized successfully');
         } else {
           console.log('[App Helper] No initializeApp found, using default export');
-          app = server.default || server;
+          expressApp = server.default || server;
         }
-        return app;
+        
+        // Usa serverless-http para adaptar o Express app para serverless
+        handler = serverless(expressApp, {
+          binary: ['image/*', 'application/pdf']
+        });
+        
+        console.log('[App Helper] Serverless handler created');
+        return handler;
       } catch (error) {
         console.error('[App Helper] Error initializing app:', error);
         console.error('[App Helper] Error message:', error.message);
@@ -42,5 +52,5 @@ async function getApp() {
   return await initPromise;
 }
 
-module.exports = { getApp };
+module.exports = { getHandler };
 

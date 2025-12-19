@@ -1,7 +1,7 @@
 // Handler catch-all para todas as rotas de API
-// Captura /api/* e processa com o Express app
+// Captura /api/* e processa com o Express app usando serverless-http
 // Usa [...path] para capturar todas as rotas de API em uma única função
-const { getApp } = require('./_lib/app');
+const { getHandler } = require('./_lib/app');
 
 module.exports = async (req, res) => {
   try {
@@ -26,9 +26,9 @@ module.exports = async (req, res) => {
     console.log(`[API Catch-All] Original URL: ${req.originalUrl}`);
     console.log(`[API Catch-All] Path: ${req.path}`);
     
-    const app = await getApp();
-    // Chama o Express app - ele vai processar a rota correta baseado em req.url
-    app(req, res);
+    // Usa serverless-http handler que adapta corretamente req/res para Express
+    const handler = await getHandler();
+    return handler(req, res);
   } catch (error) {
     console.error('[API Catch-All] Error:', error);
     console.error('[API Catch-All] Error message:', error.message);
