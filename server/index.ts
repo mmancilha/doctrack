@@ -103,7 +103,8 @@ async function initializeApp() {
 // Para Vercel (serverless), não inicializamos aqui
 // A inicialização será feita no api/index.js quando necessário
 // Para desenvolvimento/produção tradicional, inicia o servidor
-if (!process.env.VERCEL) {
+// A Vercel define VERCEL=1 automaticamente
+if (!process.env.VERCEL && process.env.NODE_ENV !== "production") {
   // Comportamento normal para desenvolvimento/produção tradicional
   (async () => {
     await initializeApp();
