@@ -82,15 +82,19 @@ async function initializeApp() {
       throw err;
     });
 
-    // importantly only setup vite in development and after
-    // setting up all the other routes so the catch-all route
-    // doesn't interfere with the other routes
-    if (process.env.NODE_ENV === "production") {
-      serveStatic(app);
-    } else {
-      const { setupVite } = await import("./vite");
-      await setupVite(httpServer, app);
-    }
+  // importantly only setup vite in development and after
+  // setting up all the other routes so the catch-all route
+  // doesn't interfere with the other routes
+  // Na Vercel, não servimos arquivos estáticos - a Vercel faz isso automaticamente
+  if (process.env.VERCEL) {
+    // Na Vercel, não configuramos serveStatic
+    // A Vercel serve os arquivos estáticos automaticamente
+  } else if (process.env.NODE_ENV === "production") {
+    serveStatic(app);
+  } else {
+    const { setupVite } = await import("./vite");
+    await setupVite(httpServer, app);
+  }
 
     appInitialized = true;
     return app;
