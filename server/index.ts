@@ -27,6 +27,9 @@ app.use(express.urlencoded({ extended: false, limit: "5mb" }));
 
 setupAuth(app);
 
+// Variável para controlar se o app foi inicializado
+let appInitialized = false;
+
 export function log(message: string, source = "express") {
   const formattedTime = new Date().toLocaleTimeString("en-US", {
     hour: "numeric",
@@ -64,7 +67,10 @@ app.use((req, res, next) => {
   next();
 });
 
-(async () => {
+// Função assíncrona para inicializar o app
+async function initializeApp() {
+  if (appInitialized) return app;
+  
   await registerRoutes(httpServer, app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
@@ -85,13 +91,28 @@ app.use((req, res, next) => {
     await setupVite(httpServer, app);
   }
 
-  // ALWAYS serve the app on the port specified in the environment variable PORT
-  // Other ports are firewalled. Default to 5000 if not specified.
-  // this serves both the API and the client.
-  // It is the only port that is not firewalled.
-  const port = parseInt(process.env.PORT || "5000", 10);
-  const host = process.env.HOST || "localhost";
-  httpServer.listen(port, host, () => {
-    log(`serving on http://${host}:${port}`);
-  });
-})();
+  appInitialized = true;
+  return app;
+}
+
+// Para Vercel (serverless), inicializa o app e exporta
+// Para desenvolvimento/produção tradicional, inicia o servidor
+if (process.env.VERCEL) {
+  // Na Vercel, inicializamos o app mas não iniciamos o servidor HTTP
+  initializeApp().catch(console.error);
+} else {
+  // Comportamento normal para desenvolvimento/produção tradicional
+  (async () => {
+    await initializeApp();
+    const port = parseInt(process.env.PORT || "5000", 10);
+    const host = process.env.HOST || "localhost";
+    httpServer.listen(port, host, () => {
+      log(`serving on http://${host}:${port}`);
+    });
+  })();
+}
+
+// Exporta o app Express para uso em serverless (Vercel)
+// A Vercel vai chamar initializeApp() quando necessário
+export default app;
+export { initializeApp };
