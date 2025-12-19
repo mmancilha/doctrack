@@ -98,8 +98,7 @@ export function AppSidebar() {
           transition={{ type: "spring", stiffness: 300, damping: 20 }}
           className="flex flex-col"
         >
-          <DocTrackLogoCompact className="text-foreground" width={120} height={40} />
-          <span className="text-xs text-muted-foreground mt-1">{t("appDescription")}</span>
+          <DocTrackLogoCompact className="text-foreground" width={180} height={50} />
         </motion.div>
       </SidebarHeader>
 

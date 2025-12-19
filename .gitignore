@@ -1,35 +1,90 @@
-node_modules
-dist
-.DS_Store
-server/public
-vite.config.ts.*
-*.tar.gz
+# Dependencies
+node_modules/
+package-lock.json
 
-# Documentation files
-*.md
-!README.md
+# Build outputs
+dist/
+build/
+*.tsbuildinfo
 
-# Local files
-.local/
-attached_assets/
-
-# Backup files
-*.backup.*
-*.backup.tsx
-
-# IDE
-.vscode/
-.idea/
-
-# Environment
+# Environment variables (CRITICAL - never commit)
 .env
 .env.local
 .env.*.local
+.env.development
+.env.production
+.env.test
+
+# Database files
+*.db
+*.sqlite
+*.sql
 
 # Logs
 *.log
 npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
-# Database
-*.db
-*.sqlite
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+
+# Temporary files
+*.tmp
+*.temp
+*.cache
+.cache/
+
+# Local development
+.local/
+attached_assets/
+server/public/
+
+# Backup files
+*.backup.*
+*.backup.tsx
+*.bak
+*~
+
+# Documentation (keep only README.md)
+*.md
+!README.md
+
+# Replit files (removed)
+.replit
+replit.md
+
+# Vite
+vite.config.ts.*
+*.tar.gz
+
+# Secrets and credentials
+secrets/
+credentials/
+*.pem
+*.key
+*.cert
+*.p12
+*.pfx
+
+# Migration files (if sensitive)
+migrations/*.sql

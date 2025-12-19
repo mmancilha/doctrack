@@ -119,6 +119,7 @@ export default function Login() {
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.4, ease: "easeOut" }}
+            className="mb-2"
           >
             <DocTrackLogoWithIcon
               className="text-foreground"
@@ -126,7 +127,7 @@ export default function Login() {
               height={50}
             />
           </motion.div>
-          <p className="text-muted-foreground text-sm -mt-2 font-medium">
+          <p className="text-muted-foreground text-sm font-medium">
             {tCommon("appDescription")}
           </p>
         </div>
