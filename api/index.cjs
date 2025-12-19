@@ -48,8 +48,11 @@ async function getApp() {
 // A Vercel espera uma função que recebe (req, res)
 module.exports = async (req, res) => {
   try {
+    console.log(`[API Handler] ${req.method} ${req.url}`);
     const initializedApp = await getApp();
-    return initializedApp(req, res);
+    // Chama o app Express diretamente - ele vai lidar com req e res
+    // Express não retorna nada, ele processa a requisição diretamente
+    initializedApp(req, res);
   } catch (error) {
     console.error('Error in serverless function:', error);
     console.error('Error message:', error.message);
