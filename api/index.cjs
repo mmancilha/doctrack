@@ -48,15 +48,11 @@ async function getApp() {
 // A Vercel espera uma função que recebe (req, res)
 module.exports = async (req, res) => {
   try {
-    // Preserva o path original da requisição
-    // Quando o rewrite acontece, o path pode mudar, então garantimos que está correto
-    const originalUrl = req.url;
-    const pathMatch = originalUrl.match(/^\/api\/(.*)$/) || originalUrl.match(/^\/(.*)$/);
-    if (pathMatch && !originalUrl.startsWith('/api/')) {
-      req.url = '/api/' + (pathMatch[1] || '');
-    }
+    // Log detalhado para debug
+    console.log(`[API Handler] ${req.method} ${req.url}`);
+    console.log(`[API Handler] Original URL: ${req.originalUrl || req.url}`);
+    console.log(`[API Handler] Path: ${req.path}`);
     
-    console.log(`[API Handler] ${req.method} ${req.url} (original: ${originalUrl})`);
     const initializedApp = await getApp();
     // Chama o app Express diretamente - ele vai lidar com req e res
     // Express não retorna nada, ele processa a requisição diretamente
