@@ -5,21 +5,25 @@ const { getApp } = require('./_lib/app');
 
 module.exports = async (req, res) => {
   try {
-    // Quando a Vercel usa catch-all [...path], ela roteia /api/* para este arquivo
-    // O req.url já deve conter o path completo (ex: /api/auth/login)
-    // Mas vamos garantir que está correto e logar para debug
+    // CRÍTICO: Quando a Vercel usa catch-all [...path], ela roteia /api/* para este arquivo
+    // O req.url pode estar como /auth/login (sem /api) ou /api/auth/login (com /api)
+    // Precisamos garantir que sempre tenha o prefixo /api para o Express encontrar a rota
     
-    // Se req.url não começa com /api, pode ser que o path foi capturado sem o prefixo
-    // Nesse caso, reconstruir adicionando /api
-    if (!req.url.startsWith('/api')) {
-      // Se o path não começa com /api, adicionar o prefixo
-      req.url = '/api' + (req.url.startsWith('/') ? req.url : '/' + req.url);
-      req.originalUrl = req.url;
+    let pathToUse = req.url;
+    
+    // Se req.url não começa com /api, adicionar o prefixo
+    if (!pathToUse.startsWith('/api')) {
+      // Adicionar /api no início
+      pathToUse = '/api' + (pathToUse.startsWith('/') ? pathToUse : '/' + pathToUse);
     }
+    
+    // Atualizar req.url e req.originalUrl para o Express
+    req.url = pathToUse;
+    req.originalUrl = pathToUse;
     
     // Logs para debug
     console.log(`[API Catch-All] ${req.method} ${req.url}`);
-    console.log(`[API Catch-All] Original URL: ${req.originalUrl || req.url}`);
+    console.log(`[API Catch-All] Original URL: ${req.originalUrl}`);
     console.log(`[API Catch-All] Path: ${req.path}`);
     
     const app = await getApp();
