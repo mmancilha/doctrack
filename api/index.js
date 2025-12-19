@@ -7,9 +7,9 @@ let app = null;
 let initPromise = null;
 
 // Função para inicializar o app uma única vez
-function getApp() {
+async function getApp() {
   if (app) {
-    return Promise.resolve(app);
+    return app;
   }
   
   if (!initPromise) {
@@ -25,22 +25,31 @@ function getApp() {
         return app;
       } catch (error) {
         console.error('Error initializing app:', error);
+        console.error('Stack:', error.stack);
         throw error;
       }
     })();
   }
   
-  return initPromise;
+  return await initPromise;
 }
 
 // Exporta um handler que aguarda a inicialização
+// A Vercel espera uma função que recebe (req, res)
 module.exports = async (req, res) => {
   try {
     const initializedApp = await getApp();
-    return initializedApp(req, res);
+    initializedApp(req, res);
   } catch (error) {
     console.error('Error in serverless function:', error);
-    res.status(500).json({ error: 'Internal server error', message: error.message });
+    console.error('Stack:', error.stack);
+    if (!res.headersSent) {
+      res.status(500).json({ 
+        error: 'Internal server error', 
+        message: error.message,
+        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      });
+    }
   }
 };
 
