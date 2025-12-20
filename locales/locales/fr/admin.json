@@ -1,0 +1,92 @@
+{
+  "title": "Admin",
+  "users": {
+    "title": "Gestion des Utilisateurs",
+    "description": "Gérez les comptes utilisateurs et les permissions",
+    "addUser": "Ajouter un Utilisateur",
+    "allUsers": "Tous les Utilisateurs",
+    "usersCount": "{{count}} utilisateur",
+    "usersCount_other": "{{count}} utilisateurs",
+    "usersWithAccess": "Utilisateurs ayant accès à DocTrack",
+    "you": "Vous",
+    "loadingUsers": "Chargement des utilisateurs...",
+    "create": {
+      "title": "Créer un Nouvel Utilisateur",
+      "description": "Ajoutez un nouvel utilisateur au système. Il pourra se connecter avec ces identifiants.",
+      "username": "Nom d'utilisateur",
+      "usernamePlaceholder": "Entrez le nom d'utilisateur",
+      "password": "Mot de passe",
+      "passwordPlaceholder": "Entrez le mot de passe",
+      "role": "Rôle",
+      "roleReader": "Lecteur - Peut consulter les documents",
+      "roleEditor": "Éditeur - Peut modifier les documents",
+      "roleAdmin": "Admin - Accès complet",
+      "submit": "Créer l'Utilisateur",
+      "creating": "Création..."
+    },
+    "edit": {
+      "title": "Modifier l'Utilisateur : {{username}}",
+      "description": "Mettez à jour le rôle ou réinitialisez le mot de passe de cet utilisateur.",
+      "role": "Rôle",
+      "newPassword": "Nouveau Mot de Passe (optionnel)",
+      "newPasswordPlaceholder": "Laissez vide pour garder le mot de passe actuel",
+      "submit": "Enregistrer les Modifications",
+      "saving": "Enregistrement..."
+    },
+    "delete": {
+      "title": "Supprimer l'Utilisateur",
+      "description": "Êtes-vous sûr de vouloir supprimer \"{{username}}\" ? Cette action est irréversible."
+    },
+    "toast": {
+      "created": {
+        "title": "Utilisateur créé",
+        "description": "Le nouvel utilisateur a été créé avec succès."
+      },
+      "updated": {
+        "title": "Utilisateur mis à jour",
+        "description": "L'utilisateur a été mis à jour avec succès."
+      },
+      "deleted": {
+        "title": "Utilisateur supprimé",
+        "description": "L'utilisateur a été supprimé avec succès."
+      },
+      "error": {
+        "create": "Échec de la création de l'utilisateur.",
+        "update": "Échec de la mise à jour de l'utilisateur.",
+        "delete": "Échec de la suppression de l'utilisateur.",
+        "required": "Le nom d'utilisateur et le mot de passe sont requis.",
+        "noChanges": "Veuillez fournir un rôle ou un mot de passe à mettre à jour."
+      }
+    },
+    "accessDenied": {
+      "title": "Accès Refusé",
+      "description": "Seuls les administrateurs peuvent accéder à la gestion des utilisateurs."
+    }
+  },
+  "auditLogs": {
+    "title": "Journaux d'Audit",
+    "description": "Suivez toutes les modifications de documents et actions des utilisateurs",
+    "activityHistory": "Historique des Activités",
+    "noActivity": "Aucune activité enregistrée pour le moment",
+    "byUser": "par {{user}} le {{date}}",
+    "actions": {
+      "created": "a créé",
+      "updated": "a mis à jour",
+      "deleted": "a supprimé",
+      "viewed": "a consulté",
+      "commented": "a commenté"
+    },
+    "details": {
+      "createdDocument": "Document créé : {{title}}",
+      "updatedDocument": "Document mis à jour : {{title}}",
+      "deletedDocument": "Document supprimé : {{title}}",
+      "addedComment": "Commentaire ajouté sur le document : {{title}}"
+    },
+    "accessDenied": {
+      "title": "Accès Refusé",
+      "description": "Vous n'avez pas la permission de consulter les journaux d'audit.",
+      "hint": "Cette fonctionnalité est réservée aux administrateurs."
+    }
+  }
+}
+

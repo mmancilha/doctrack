@@ -1,0 +1,189 @@
+{
+  "richEditor": {
+    "loading": "Chargement de l'éditeur...",
+    "promptUrl": "Entrez l'URL :",
+    "promptImageUrl": "Entrez l'URL de l'image :",
+    "undo": "Annuler",
+    "redo": "Rétablir",
+    "heading1": "Titre 1",
+    "heading2": "Titre 2",
+    "heading3": "Titre 3",
+    "bold": "Gras",
+    "italic": "Italique",
+    "underline": "Souligné",
+    "strikethrough": "Barré",
+    "code": "Code",
+    "bulletList": "Liste à Puces",
+    "orderedList": "Liste Numérotée",
+    "quote": "Citation",
+    "horizontalRule": "Ligne Horizontale",
+    "addLink": "Ajouter un Lien",
+    "addImage": "Ajouter une Image",
+    "insertTable": "Insérer un Tableau"
+  },
+  "editor": {
+    "titlePlaceholder": "Titre du document...",
+    "contentPlaceholder": "Commencez à rédiger votre document...",
+    "category": "Catégorie",
+    "status": "Statut",
+    "client": "Client",
+    "clientPlaceholder": "Sélectionnez ou tapez le nom du client...",
+    "selectClient": "Sélectionner un client",
+    "searchClient": "Rechercher un client...",
+    "noClientFound": "Aucun client trouvé.",
+    "createClient": "Créer le client \"{{name}}\"",
+    "existingClients": "Clients existants",
+          "save": "Enregistrer",
+          "saving": "Enregistrement...",
+          "exporting": "Exportation...",
+          "create": "Créer",
+    "delete": "Supprimer",
+    "history": "Historique",
+    "versions": "Versions",
+    "versionHistory": "Historique des Versions",
+    "compare": "Comparer",
+    "comments": "Commentaires",
+    "export": "Exporter",
+    "exportPdf": "Exporter PDF",
+    "exportCurrentVersion": "Exporter la Version Actuelle",
+    "exportVersion": "Exporter v{{version}}",
+    "exportAsPdf": "Exporter en PDF",
+    "deleteDocument": "Supprimer le Document",
+    "moreOptions": "Plus d'options",
+    "general": "Général"
+  },
+  "deleteConfirm": {
+    "title": "Supprimer le document ?",
+    "description": "Cette action est irréversible. Le document sera définitivement supprimé du système.",
+    "cancel": "Annuler",
+    "confirm": "Supprimer"
+  },
+  "toast": {
+    "created": {
+      "title": "Document créé",
+      "description": "Votre document a été enregistré."
+    },
+    "saved": {
+      "title": "Document enregistré",
+      "description": "Vos modifications ont été enregistrées."
+    },
+    "deleted": {
+      "title": "Document supprimé",
+      "description": "Le document a été supprimé."
+    },
+    "exported": {
+      "title": "PDF exporté",
+      "description": "Votre document a été téléchargé."
+    },
+    "versionLoaded": {
+      "title": "Version chargée",
+      "description": "Version {{version}} chargée. Enregistrez pour conserver les modifications."
+    },
+    "error": {
+      "title": "Erreur",
+      "create": "Échec de la création du document.",
+      "save": "Échec de l'enregistrement du document.",
+      "export": "Échec de l'exportation du PDF.",
+      "noTitle": "Veuillez entrer un titre pour le document.",
+      "noClient": "Veuillez entrer un nom de client.",
+      "noPermission": "Vous n'avez pas la permission de modifier les documents."
+    }
+  },
+  "versions": {
+    "title": "Historique des Versions",
+    "count": "{{count}} version",
+    "count_other": "{{count}} versions",
+    "latest": "Plus récente",
+    "selected": "Sélectionnée",
+    "noVersions": "Aucune version pour le moment",
+    "noVersionsHint": "Les versions sont créées lorsque vous enregistrez des modifications",
+    "selectToCompare": "Cliquez sur une version pour la sélectionner pour comparaison",
+    "selectedVersion": "Version v{{version}} sélectionnée. Cliquez sur une autre version pour comparer."
+  },
+  "diff": {
+    "title": "Comparaison des Versions",
+    "comparing": "Comparaison de v{{v1}} avec v{{v2}}",
+    "from": "De",
+    "to": "Vers",
+    "additions": "caractères ajoutés",
+    "additions_other": "caractères ajoutés",
+    "deletions": "caractères supprimés",
+    "deletions_other": "caractères supprimés",
+    "noChanges": "Aucune modification de texte entre les versions",
+    "noChangesHint": "Les documents peuvent avoir d'autres différences non affichées en texte brut."
+  },
+  "comments": {
+    "title": "Commentaires",
+    "placeholder": "Ajouter un commentaire...",
+    "send": "Envoyer",
+    "cancel": "Annuler",
+    "addComment": "Ajouter un Commentaire",
+    "selectedText": "Texte sélectionné",
+    "loading": "Chargement des commentaires...",
+    "noComments": "Aucun commentaire pour le moment",
+    "noCommentsHint": "Soyez le premier à commenter ce document.",
+    "resolve": "Résoudre",
+    "resolved": "Résolu",
+    "deleteConfirm": "Êtes-vous sûr de vouloir supprimer ce commentaire ?",
+    "toast": {
+      "added": {
+        "title": "Commentaire ajouté",
+        "description": "Votre commentaire a été publié."
+      },
+      "deleted": {
+        "title": "Commentaire supprimé",
+        "description": "Le commentaire a été supprimé."
+      },
+      "error": {
+        "add": "Échec de l'ajout du commentaire.",
+        "delete": "Échec de la suppression du commentaire."
+      }
+    }
+  },
+  "list": {
+    "title": "Tous les Documents",
+    "description": "Parcourez et gérez toute votre documentation.",
+    "empty": {
+      "title": "Aucun document trouvé",
+      "description": "Essayez d'ajuster votre recherche ou créez un nouveau document."
+    },
+    "search": "Rechercher des documents...",
+    "noContent": "Pas encore de contenu"
+  },
+  "recent": {
+    "title": "Documents Récents",
+    "description": "Documents que vous avez récemment consultés ou modifiés.",
+    "empty": {
+      "title": "Aucun document récent",
+      "description": "Les documents que vous consultez ou modifiez apparaîtront ici."
+    }
+  },
+  "category": {
+    "title": "{{category}}",
+    "description": "Parcourez tous les {{category}} de votre bibliothèque.",
+    "empty": {
+      "title": "Aucun {{category}} trouvé",
+      "description": "Créez votre premier {{singular}} pour commencer."
+    }
+  },
+  "notFound": {
+    "title": "Page Non Trouvée",
+    "description": "La page que vous recherchez n'existe pas ou a été déplacée."
+  },
+  "filters": {
+    "allTime": "Toute la période",
+    "last7Days": "7 derniers jours",
+    "last30Days": "30 derniers jours",
+    "last90Days": "90 derniers jours",
+    "allCategories": "Toutes les Catégories",
+    "allStatuses": "Tous les Statuts",
+    "date": "Date",
+    "activeFilters": "Filtres actifs",
+    "search": "Recherche",
+    "clearAll": "Tout effacer",
+    "showing": "Affichage de",
+    "documents": "documents",
+    "document": "document"
+  }
+}
+
