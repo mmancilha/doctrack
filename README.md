@@ -7,12 +7,12 @@
 **A modern, enterprise-grade document management system**
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-000000?style=flat-square&logo=next.js&logoColor=white)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-20232A?style=flat-square&logo=react&logoColor=61DAFB)](https://reactjs.org/)
-[![Node.js](https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=flat-square&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 
-[Features](#-features) • [Tech Stack](#-tech-stack) • [Screenshots](#-screenshots) • [Author](#-author)
+[Features](#-features) • [Tech Stack](#-tech-stack) • [Getting Started](#-getting-started) • [Screenshots](#-screenshots) • [Author](#-author)
 
 </div>
 
@@ -62,6 +62,7 @@ DocTrack is a comprehensive document management solution designed for businesses
 | Technology    | Purpose              |
 | ------------- | -------------------- |
 | React 18      | UI Framework         |
+| Next.js 16    | Full-stack Framework |
 | TypeScript    | Type Safety          |
 | Tailwind CSS  | Styling              |
 | shadcn/ui     | Component Library    |
@@ -77,7 +78,7 @@ DocTrack is a comprehensive document management solution designed for businesses
 
 | Technology  | Purpose          |
 | ----------- | ---------------- |
-| Next.js     | Full-stack Framework |
+| Next.js     | API Routes       |
 | Node.js     | Runtime          |
 | Drizzle ORM | Database ORM     |
 | PostgreSQL  | Database         |
@@ -88,7 +89,72 @@ DocTrack is a comprehensive document management solution designed for businesses
 </tr>
 </table>
 
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js 18+ and npm
+- PostgreSQL database (or use [Neon.tech](https://neon.tech) for free cloud database)
+
+### Installation
+
+1. **Clone the repository:**
+```bash
+git clone https://github.com/mmancilha/doctrack.git
+cd doctrack
+```
+
+2. **Install dependencies:**
+```bash
+npm install
+```
+
+3. **Configure environment variables:**
+
+Create a `.env` file in the root directory:
+
+```env
+DATABASE_URL=postgresql://user:password@host:port/database
+SESSION_SECRET=your-secret-key-minimum-32-characters-long
+NODE_ENV=development
+```
+
+> **Note:** `SESSION_SECRET` must be at least 32 characters long for security.
+
+4. **Set up the database:**
+```bash
+# Create database tables
+npm run db:push
+
+# Seed with test data (optional)
+npm run seed
+```
+
+5. **Start the development server:**
+```bash
+npm run dev
+```
+
+6. **Open your browser:**
+Navigate to [http://localhost:3000](http://localhost:3000)
+
+### Test Users
+
+After running the seed script, you can login with:
+
+| Username | Password | Role   |
+|----------|----------|--------|
+| admin    | admin123 | admin  |
+| editor   | editor123| editor |
+| reader   | reader123| reader |
+
 ## 📸 Screenshots
+
+### Login Page
+
+Clean and modern login interface.
+
+![Login](docs/screenshots/doctrack-login.png)
 
 ### Dashboard
 
@@ -122,9 +188,21 @@ doctrack/
 │   └── auth-helpers.ts     # Authentication helpers
 ├── shared/                 # Shared types and schemas
 │   └── schema.ts           # Drizzle ORM schemas
+├── scripts/                # Utility scripts
+│   └── seed.ts             # Database seeding script
 ├── locales/                # i18n translation files
+├── middleware.ts           # Next.js middleware for route protection
 └── package.json
 ```
+
+## 📝 Available Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run start` - Start production server
+- `npm run check` - Run TypeScript type checking
+- `npm run db:push` - Push database schema changes
+- `npm run seed` - Seed database with test data
 
 ## 👤 Author
 
