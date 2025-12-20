@@ -12,7 +12,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=flat-square&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 
-[Features](#-features) • [Tech Stack](#-tech-stack) • [Getting Started](#-getting-started) • [Screenshots](#-screenshots) • [Author](#-author)
+[Features](#-features) • [Tech Stack](#-tech-stack) • [Screenshots](#-screenshots) • [Author](#-author)
 
 </div>
 
@@ -88,65 +88,6 @@ DocTrack is a comprehensive document management solution designed for businesses
 </td>
 </tr>
 </table>
-
-## 🚀 Getting Started
-
-### Prerequisites
-
-- Node.js 18+ and npm
-- PostgreSQL database (or use [Neon.tech](https://neon.tech) for free cloud database)
-
-### Installation
-
-1. **Clone the repository:**
-```bash
-git clone https://github.com/mmancilha/doctrack.git
-cd doctrack
-```
-
-2. **Install dependencies:**
-```bash
-npm install
-```
-
-3. **Configure environment variables:**
-
-Create a `.env` file in the root directory:
-
-```env
-DATABASE_URL=postgresql://user:password@host:port/database
-SESSION_SECRET=your-secret-key-minimum-32-characters-long
-NODE_ENV=development
-```
-
-> **Note:** `SESSION_SECRET` must be at least 32 characters long for security.
-
-4. **Set up the database:**
-```bash
-# Create database tables
-npm run db:push
-
-# Seed with test data (optional)
-npm run seed
-```
-
-5. **Start the development server:**
-```bash
-npm run dev
-```
-
-6. **Open your browser:**
-Navigate to [http://localhost:3000](http://localhost:3000)
-
-### Test Users
-
-After running the seed script, you can login with:
-
-| Username | Password | Role   |
-|----------|----------|--------|
-| admin    | admin123 | admin  |
-| editor   | editor123| editor |
-| reader   | reader123| reader |
 
 ## 📸 Screenshots
 
