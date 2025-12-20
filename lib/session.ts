@@ -1,16 +1,29 @@
 import { NextRequest, NextResponse } from "next/server";
 import { SignJWT, jwtVerify } from "jose";
 
-const secret = new TextEncoder().encode(
-  process.env.SESSION_SECRET || "doctrack-secret-key-change-in-production-min-32-chars-required"
-);
+// Validar SESSION_SECRET obrigatório
+if (!process.env.SESSION_SECRET) {
+  throw new Error(
+    "SESSION_SECRET environment variable is required. Please set it in your .env file with at least 32 characters."
+  );
+}
+
+if (process.env.SESSION_SECRET.length < 32) {
+  throw new Error(
+    "SESSION_SECRET must be at least 32 characters long for security."
+  );
+}
+
+const secret = new TextEncoder().encode(process.env.SESSION_SECRET);
 
 export interface SessionUser {
   id: string;
   username: string;
   role: string;
-  displayName: string | null;
-  avatarUrl: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
+  displayName?: string | null; // Mantido para compatibilidade
+  avatarUrl?: string | null;
 }
 
 const COOKIE_NAME = "doctrack-session";
@@ -23,7 +36,9 @@ export async function createSession(user: SessionUser): Promise<string> {
     id: user.id,
     username: user.username,
     role: user.role,
-    displayName: user.displayName,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    displayName: user.displayName, // Mantido para compatibilidade
     // Se avatarUrl for base64 muito grande, não incluir no JWT
     // O frontend pode buscar do banco quando necessário
     avatarUrl: user.avatarUrl && user.avatarUrl.length > 200 
@@ -51,9 +66,27 @@ export async function getSessionUser(
 
   try {
     const { payload } = await jwtVerify(token, secret);
-    // O payload agora contém os dados diretamente, não em um objeto 'user'
-    return payload as SessionUser;
-  } catch {
+    // Validar e converter o payload para SessionUser
+    if (
+      typeof payload === "object" &&
+      payload !== null &&
+      "id" in payload &&
+      "username" in payload &&
+      "role" in payload
+    ) {
+      return {
+        id: String(payload.id),
+        username: String(payload.username),
+        role: String(payload.role),
+        firstName: payload.firstName !== undefined ? (payload.firstName as string | null) : null,
+        lastName: payload.lastName !== undefined ? (payload.lastName as string | null) : null,
+        displayName: payload.displayName !== undefined ? (payload.displayName as string | null) : null,
+        avatarUrl: payload.avatarUrl !== undefined ? (payload.avatarUrl as string | null) : null,
+      };
+    }
+    return null;
+  } catch (error) {
+    console.error("Error verifying session token:", error);
     return null;
   }
 }
