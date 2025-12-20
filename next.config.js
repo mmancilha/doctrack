@@ -1,8 +1,4 @@
-import { fileURLToPath } from 'url';
-import { dirname, resolve } from 'path';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+import { resolve } from 'path';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -16,12 +12,11 @@ const nextConfig = {
   webpack: (config) => {
     config.resolve.alias = {
       ...config.resolve.alias,
-      '@': resolve(__dirname, './'),
-      '@shared': resolve(__dirname, './shared'),
+      '@': resolve(process.cwd(), './'),
+      '@shared': resolve(process.cwd(), './shared'),
     };
     return config;
   },
 };
 
 export default nextConfig;
-
