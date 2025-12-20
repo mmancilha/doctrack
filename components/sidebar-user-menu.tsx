@@ -36,6 +36,7 @@ import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/lib/auth";
 import { ProfileDialog } from "./profile-dialog";
 import { supportedLanguages, changeLanguage } from "@/lib/i18n";
+import { getFullName, getFirstName, getInitials } from "@/lib/user-utils";
 
 const roleColors: Record<string, string> = {
   admin: "bg-primary text-primary-foreground",
@@ -62,13 +63,9 @@ export function SidebarUserMenu() {
   };
 
   const currentLanguage = i18n.language?.split("-")[0] || "en";
-  const displayName = user.displayName || user.username;
-  const initials = displayName
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
+  const fullName = getFullName(user);
+  const firstName = getFirstName(user);
+  const initials = getInitials(user);
 
   const currentLang = supportedLanguages.find((l) => l.code === currentLanguage);
   const getRoleLabel = (role: string) => {
@@ -88,13 +85,13 @@ export function SidebarUserMenu() {
           data-testid="sidebar-user-menu"
         >
           <Avatar className="h-8 w-8 rounded-lg">
-            {user.avatarUrl && <AvatarImage src={user.avatarUrl} alt={displayName} className="object-cover" />}
+            {user.avatarUrl && <AvatarImage src={user.avatarUrl} alt={fullName} className="object-cover" />}
             <AvatarFallback className="rounded-lg bg-primary/10 text-primary text-sm font-medium">
               {initials}
             </AvatarFallback>
           </Avatar>
           <div className="grid flex-1 text-left text-sm leading-tight">
-            <span className="truncate font-medium">{displayName}</span>
+            <span className="truncate font-medium">{firstName}</span>
             <span className="truncate text-xs text-muted-foreground">
               {getRoleLabel(user.role)}
             </span>
@@ -111,13 +108,13 @@ export function SidebarUserMenu() {
         <DropdownMenuLabel className="p-0 font-normal">
           <div className="flex items-center gap-2 px-2 py-1.5 text-left text-sm">
             <Avatar className="h-8 w-8 rounded-lg">
-              {user.avatarUrl && <AvatarImage src={user.avatarUrl} alt={displayName} className="object-cover" />}
+              {user.avatarUrl && <AvatarImage src={user.avatarUrl} alt={fullName} className="object-cover" />}
               <AvatarFallback className="rounded-lg bg-primary/10 text-primary">
                 {initials}
               </AvatarFallback>
             </Avatar>
             <div className="grid flex-1 text-left text-sm leading-tight">
-              <span className="truncate font-medium">{displayName}</span>
+              <span className="truncate font-medium">{fullName}</span>
               <Badge
                 variant="secondary"
                 className={`w-fit text-xs mt-1 ${roleColors[user.role]}`}
@@ -188,11 +185,19 @@ export function SidebarUserMenu() {
         </DropdownMenuItem>
       </DropdownMenuContent>
 
-      <ProfileDialog
-        user={user}
-        open={showProfileDialog}
-        onOpenChange={setShowProfileDialog}
-      />
+      {user && (
+        <ProfileDialog
+          user={{
+            ...user,
+            firstName: user.firstName ?? null,
+            lastName: user.lastName ?? null,
+            displayName: user.displayName ?? null,
+            avatarUrl: user.avatarUrl ?? null,
+          }}
+          open={showProfileDialog}
+          onOpenChange={setShowProfileDialog}
+        />
+      )}
     </DropdownMenu>
   );
 }

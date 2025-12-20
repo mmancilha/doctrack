@@ -35,8 +35,10 @@ export async function POST(request: NextRequest) {
       id: user.id,
       username: user.username,
       role: user.role,
-      displayName: user.displayName,
-      avatarUrl: user.avatarUrl,
+      firstName: user.firstName ?? null,
+      lastName: user.lastName ?? null,
+      displayName: user.displayName ?? null, // Mantido para compatibilidade
+      avatarUrl: user.avatarUrl ?? null,
     };
 
     const token = await createSession(sessionUser);

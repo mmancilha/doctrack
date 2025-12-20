@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth-helpers";
 import { storage } from "@/lib/storage";
 import { resolveParams } from "@/lib/route-helpers";
+import { getFullName } from "@/lib/user-helpers";
 import { z } from "zod";
 
 const commentSchema = z.object({
@@ -80,7 +81,7 @@ export async function POST(
     const comment = await storage.createComment({
       documentId: id,
       authorId: user.id,
-      authorName: user.username,
+      authorName: getFullName(user),
       content,
       sectionId: sectionId || null,
       sectionText: sectionText || null,
@@ -90,7 +91,7 @@ export async function POST(
     await storage.createAuditLog({
       documentId: id,
       userId: user.id,
-      userName: user.username,
+      userName: getFullName(user),
       action: "commented",
       details: `Added comment on document: ${document.title}`,
     });

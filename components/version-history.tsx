@@ -184,7 +184,7 @@ function VersionItem({
           <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
             <span className="flex items-center gap-1">
               <User className="h-3 w-3" />
-              {version.authorName}
+              {version.authorName.split(" ")[0]}
             </span>
             <Tooltip>
               <TooltipTrigger asChild>

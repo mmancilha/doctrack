@@ -177,7 +177,7 @@ export function SectionComments({ documentId, selectedText, onClose }: SectionCo
                         <div className="flex items-center justify-between gap-2">
                           <div className="flex items-center gap-2 text-xs text-muted-foreground">
                             <User className="h-3 w-3" />
-                            <span>{comment.authorName}</span>
+                            <span>{comment.authorName.split(" ")[0]}</span>
                             <span>·</span>
                             <span>{formatRelativeTime(new Date(comment.createdAt), i18n.language)}</span>
                           </div>
@@ -216,7 +216,7 @@ export function SectionComments({ documentId, selectedText, onClose }: SectionCo
                       <p className="text-sm line-through">{comment.content}</p>
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
                         <Badge variant="secondary" className="text-xs">{t("comments.resolved")}</Badge>
-                        <span>{comment.authorName}</span>
+                        <span>{comment.authorName.split(" ")[0]}</span>
                       </div>
                     </div>
                   ))}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, use } from "react";
+import { useState, useEffect, useCallback, use, useRef, useMemo } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslation } from "react-i18next";
@@ -20,6 +20,8 @@ import {
   ChevronsUpDown,
   Building2,
   Plus,
+  X,
+  FolderOpen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -72,8 +74,6 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { RichTextEditor } from "@/components/rich-text-editor";
 import { Spinner } from "@/components/ui/spinner";
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
 import { VersionHistory } from "@/components/version-history";
 import { VersionDiff } from "@/components/version-diff";
 import { EditorSkeleton } from "@/components/loading-skeleton";
@@ -81,7 +81,8 @@ import { SectionComments } from "@/components/section-comments";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useDocumentCategories, useDocumentStatuses } from "@/lib/constants";
 import { useAuth } from "@/lib/auth";
-import type { Document, Version, InsertDocument } from "@shared/schema";
+import { getTemplateForCategory } from "@/lib/document-templates";
+import type { Document, Version, InsertDocument, CustomCategory, CustomClient } from "@shared/schema";
 
 export default function DocumentEditor({
   params,
@@ -123,7 +124,7 @@ export default function DocumentEditor({
     if (urlCategory && validCategories.includes(urlCategory)) {
       return urlCategory;
     }
-    return "manual";
+    return ""; // Start empty for new documents
   };
 
   const [title, setTitle] = useState("");
@@ -142,8 +143,34 @@ export default function DocumentEditor({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [clientPopoverOpen, setClientPopoverOpen] = useState(false);
   const [clientSearch, setClientSearch] = useState("");
-  // Local list of clients created during this session
-  const [localClients, setLocalClients] = useState<string[]>([]);
+  const clientTriggerRef = useRef<HTMLButtonElement>(null);
+  const [clientPopoverWidth, setClientPopoverWidth] = useState<number | undefined>(undefined);
+  const [categoryPopoverOpen, setCategoryPopoverOpen] = useState(false);
+  const [categorySearch, setCategorySearch] = useState("");
+  const categoryTriggerRef = useRef<HTMLButtonElement>(null);
+  const [categoryPopoverWidth, setCategoryPopoverWidth] = useState<number | undefined>(undefined);
+  const [statusPopoverOpen, setStatusPopoverOpen] = useState(false);
+  const statusTriggerRef = useRef<HTMLButtonElement>(null);
+  const [statusPopoverWidth, setStatusPopoverWidth] = useState<number | undefined>(undefined);
+
+  // Measure trigger width when popover opens
+  useEffect(() => {
+    if (clientPopoverOpen && clientTriggerRef.current) {
+      setClientPopoverWidth(clientTriggerRef.current.offsetWidth);
+    }
+  }, [clientPopoverOpen]);
+
+  useEffect(() => {
+    if (categoryPopoverOpen && categoryTriggerRef.current) {
+      setCategoryPopoverWidth(categoryTriggerRef.current.offsetWidth);
+    }
+  }, [categoryPopoverOpen]);
+
+  useEffect(() => {
+    if (statusPopoverOpen && statusTriggerRef.current) {
+      setStatusPopoverWidth(statusTriggerRef.current.offsetWidth);
+    }
+  }, [statusPopoverOpen]);
 
   const { data: document, isLoading: isLoadingDocument } = useQuery<Document>({
     queryKey: ["/api/documents", id],
@@ -162,33 +189,145 @@ export default function DocumentEditor({
     queryKey: ["/api/documents"],
   });
 
-  // Extract unique client names from documents and combine with local clients
-  const existingClients = [
-    ...new Set([
-      ...allDocuments.map((doc) => doc.company).filter(Boolean),
-      ...localClients,
-    ]),
-  ].sort();
+  // Fetch custom categories and clients from API
+  const { data: customCategoriesData = [] } = useQuery<CustomCategory[]>({
+    queryKey: ["/api/custom-categories"],
+  });
+
+  const { data: customClientsData = [] } = useQuery<CustomClient[]>({
+    queryKey: ["/api/custom-clients"],
+  });
+
+  const createCategoryMutation = useMutation({
+    mutationFn: async (name: string) => {
+      return await apiRequest("POST", "/api/custom-categories", { name });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/custom-categories"] });
+    },
+  });
+
+  const deleteCategoryMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return await apiRequest("DELETE", `/api/custom-categories/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/custom-categories"] });
+    },
+  });
+
+  const createClientMutation = useMutation<CustomClient, Error, string>({
+    mutationFn: async (name: string) => {
+      const res = await apiRequest("POST", "/api/custom-clients", { name });
+      return await res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/custom-clients"] });
+    },
+  });
+
+  const deleteClientMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return await apiRequest("DELETE", `/api/custom-clients/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/custom-clients"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/documents"] });
+      toast({
+        title: t("filters.clientDeleteSuccess", "Cliente removido com sucesso"),
+        variant: "default",
+      });
+    },
+  });
+
+  // Extract unique client names from documents and combine with custom clients
+  const uniqueClients = useMemo(() => {
+    const clients = new Set<string>();
+    allDocuments.forEach((doc) => {
+      if (doc.company) clients.add(doc.company);
+    });
+    return Array.from(clients);
+  }, [allDocuments]);
+
+  const existingClients = useMemo(() => {
+    const customClientNames = customClientsData.map(c => c.name);
+    const allClientNames = [...new Set([...uniqueClients, ...customClientNames])];
+    return allClientNames.map(name => {
+      // Buscar por nome (case-insensitive)
+      const customClient = customClientsData.find(
+        c => c.name.toLowerCase() === name.toLowerCase()
+      );
+      return {
+        name,
+        id: customClient?.id || null,
+        isCustom: !!customClient,
+      };
+    }).sort((a, b) => a.name.localeCompare(b.name));
+  }, [uniqueClients, customClientsData]);
+
+  // Combine default categories with custom ones
+  const allCategories: Array<{ value: string; label: string; isCustom?: boolean; id?: string | null }> = useMemo(() => [
+    ...documentCategories.map(cat => ({ ...cat, isCustom: false, id: null })),
+    ...customCategoriesData
+      .filter(cat => !documentCategories.find(dc => dc.value === cat.name.toLowerCase()))
+      .map(cat => ({
+        value: cat.name.toLowerCase(),
+        label: cat.name,
+        isCustom: true,
+        id: cat.id,
+      })),
+  ], [documentCategories, customCategoriesData]);
 
   useEffect(() => {
     if (document) {
       setTitle(document.title);
-      const docCompany = document.company || "";
-      setCompany(docCompany);
-      // Add document's company to local clients if it exists
-      if (docCompany) {
-        setLocalClients((prev) => {
-          if (!prev.includes(docCompany)) {
-            return [...prev, docCompany].sort();
-          }
-          return prev;
-        });
-      }
+      setCompany(document.company || "");
       setContent(document.content);
       setCategory(document.category);
       setStatus(document.status);
     }
   }, [document]);
+
+  // Carregar template quando categoria muda em documento novo
+  const previousCategoryRef = useRef<string | null>(null);
+  const isInitialMountRef = useRef<boolean>(true);
+  
+  useEffect(() => {
+    // Só carrega template se:
+    // 1. É um documento novo
+    // 2. A categoria é válida e não está vazia
+    // 3. É o primeiro carregamento OU a categoria mudou
+    const categoryChanged = previousCategoryRef.current !== null && previousCategoryRef.current !== category;
+    const isFirstLoad = isInitialMountRef.current && previousCategoryRef.current === null;
+    const shouldLoad = isFirstLoad || (categoryChanged && isNewDocument);
+    
+    if (
+      isNewDocument &&
+      category && // Only load if category is not empty
+      validCategories.includes(category) &&
+      shouldLoad
+    ) {
+      // Only load template for valid predefined categories (not custom categories)
+      const template = getTemplateForCategory(category, t);
+      if (template) {
+        setContent(template);
+      }
+    }
+    
+    // Atualizar referências
+    if (isInitialMountRef.current) {
+      isInitialMountRef.current = false;
+    }
+    previousCategoryRef.current = category;
+  }, [category, isNewDocument, t]);
+
+  // Reset quando criar novo documento
+  useEffect(() => {
+    if (isNewDocument) {
+      previousCategoryRef.current = null;
+      isInitialMountRef.current = true;
+    }
+  }, [isNewDocument]);
 
   const createDocument = useMutation({
     mutationFn: async (data: InsertDocument) => {
@@ -255,193 +394,33 @@ export default function DocumentEditor({
 
   const exportPdf = useMutation({
     mutationFn: async (versionId?: string) => {
-      // Se tiver versionId, buscar conteúdo da versão específica
-      let contentToExport = content;
-      let versionLabel = "";
-      
-      if (versionId) {
-        const version = versions.find((v) => v.id === versionId);
-        if (version) {
-          contentToExport = version.content;
-          versionLabel = `_v${version.versionNumber}`;
-        }
+      if (!document?.id) {
+        throw new Error("Document ID is required");
       }
 
-      // Preparar traduções e labels antes de criar o HTML
-      const categoryLabel = documentCategories.find(c => c.value === category)?.label || category;
-      const statusLabel = documentStatuses.find(s => s.value === status)?.label || status;
-      const docTitle = document?.title || title || "Documento";
-      const authorName = document?.authorName || user?.username || "N/A";
-      const docDate = document ? new Date(document.updatedAt).toLocaleDateString() : new Date().toLocaleDateString();
-      const exportDate = new Date().toLocaleDateString();
+      // Usar a API route do servidor que já funciona corretamente
+      const response = await apiRequest("POST", `/api/documents/${document.id}/export-pdf`, {
+        versionId: versionId || undefined,
+      });
 
-      // Criar elemento temporário para renderizar o HTML formatado
-      const tempDiv = document.createElement("div");
-      tempDiv.id = "pdf-export-temp";
-      // Usar pixels ao invés de mm para melhor compatibilidade
-      tempDiv.style.cssText = `
-        position: fixed;
-        left: 0;
-        top: 0;
-        width: 794px;
-        min-height: 1123px;
-        padding: 76px;
-        background-color: #ffffff;
-        font-family: system-ui, -apple-system, sans-serif;
-        font-size: 14px;
-        line-height: 1.6;
-        color: #000000;
-        z-index: -9999;
-        visibility: hidden;
-        overflow: hidden;
-      `;
-      
-      // Adicionar cabeçalho
-      const header = document.createElement("div");
-      header.style.cssText = "margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #e5e7eb;";
-      header.innerHTML = `
-        <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 10px; color: #6b7280;">
-          <span>DocTrack</span>
-          <span>${exportDate}</span>
-        </div>
-        <h1 style="font-size: 24px; font-weight: bold; margin: 0 0 10px 0; color: #000000;">${docTitle.replace(/"/g, "&quot;")}</h1>
-        <div style="font-size: 10px; color: #6b7280; margin-bottom: 5px;">
-          ${t("editor.category")}: ${categoryLabel} | 
-          ${t("editor.status")}: ${statusLabel}${versionLabel ? ` | ${t("editor.versions")}: ${versionLabel.replace('_', '')}` : ''}
-        </div>
-        <div style="font-size: 10px; color: #6b7280;">
-          Autor: ${authorName} | 
-          Data: ${docDate}
-        </div>
-      `;
-      tempDiv.appendChild(header);
-
-      // Adicionar conteúdo formatado com estilos do editor
-      const contentDiv = document.createElement("div");
-      contentDiv.style.cssText = `
-        font-family: system-ui, -apple-system, sans-serif;
-        font-size: 14px;
-        line-height: 1.6;
-        color: #000000;
-      `;
-      contentDiv.innerHTML = contentToExport;
-      
-      // Aplicar estilos básicos para elementos HTML comuns
-      const style = document.createElement("style");
-      style.setAttribute("data-pdf-export", "true");
-      style.textContent = `
-        #pdf-export-temp .prose h1 { font-size: 2em; font-weight: bold; margin: 1em 0 0.5em 0; }
-        #pdf-export-temp .prose h2 { font-size: 1.5em; font-weight: bold; margin: 0.8em 0 0.4em 0; }
-        #pdf-export-temp .prose h3 { font-size: 1.25em; font-weight: bold; margin: 0.6em 0 0.3em 0; }
-        #pdf-export-temp .prose p { margin: 0.5em 0; }
-        #pdf-export-temp .prose ul, #pdf-export-temp .prose ol { margin: 0.5em 0; padding-left: 1.5em; }
-        #pdf-export-temp .prose li { margin: 0.25em 0; }
-        #pdf-export-temp .prose strong, #pdf-export-temp .prose b { font-weight: bold; }
-        #pdf-export-temp .prose em, #pdf-export-temp .prose i { font-style: italic; }
-        #pdf-export-temp .prose code { background: #f3f4f6; padding: 0.2em 0.4em; border-radius: 0.25em; font-family: monospace; }
-        #pdf-export-temp .prose blockquote { border-left: 4px solid #e5e7eb; padding-left: 1em; margin: 1em 0; color: #6b7280; }
-        #pdf-export-temp .prose table { border-collapse: collapse; width: 100%; margin: 1em 0; }
-        #pdf-export-temp .prose table td, #pdf-export-temp .prose table th { border: 1px solid #e5e7eb; padding: 0.5em; }
-        #pdf-export-temp .prose table th { background: #f9fafb; font-weight: bold; }
-        #pdf-export-temp .prose img { max-width: 100%; height: auto; }
-        #pdf-export-temp .prose a { color: #2563eb; text-decoration: underline; }
-      `;
-      document.head.appendChild(style);
-      contentDiv.className = "prose";
-      tempDiv.appendChild(contentDiv);
-
-      document.body.appendChild(tempDiv);
-
-      try {
-        // Aguardar para garantir que o elemento está renderizado
-        await new Promise(resolve => setTimeout(resolve, 500));
-
-        // Verificar se o elemento foi renderizado corretamente
-        if (!tempDiv.offsetWidth || !tempDiv.offsetHeight) {
-          throw new Error(`Elemento não renderizado: width=${tempDiv.offsetWidth}, height=${tempDiv.offsetHeight}`);
-        }
-
-        console.log("Iniciando captura html2canvas...", {
-          width: tempDiv.offsetWidth,
-          height: tempDiv.offsetHeight,
-          scrollHeight: tempDiv.scrollHeight
-        });
-
-        // Capturar como imagem usando html2canvas
-        const canvas = await html2canvas(tempDiv, {
-          scale: 1,
-          useCORS: true,
-          logging: true,
-          backgroundColor: "#ffffff",
-          allowTaint: false,
-          removeContainer: false,
-          width: tempDiv.offsetWidth,
-          height: tempDiv.scrollHeight || tempDiv.offsetHeight,
-        });
-
-        console.log("Canvas criado:", {
-          width: canvas.width,
-          height: canvas.height
-        });
-
-        // Remover elemento temporário e estilo
-        if (document.body.contains(tempDiv)) {
-          document.body.removeChild(tempDiv);
-        }
-        const styleElement = document.querySelector('style[data-pdf-export]');
-        if (styleElement && document.head.contains(styleElement)) {
-          document.head.removeChild(styleElement);
-        }
-
-        // Criar PDF
-        const pdf = new jsPDF("p", "mm", "a4");
-        const imgWidth = 210; // A4 width in mm
-        const pageHeight = 297; // A4 height in mm
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
-        const imgData = canvas.toDataURL("image/png", 1.0);
-
-        console.log("Dados da imagem:", {
-          imgWidth,
-          imgHeight,
-          pageHeight,
-          dataLength: imgData.length
-        });
-
-        let heightLeft = imgHeight;
-        let position = 0;
-
-        // Adicionar primeira página
-        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
-
-        // Adicionar páginas adicionais se necessário
-        while (heightLeft > 0) {
-          position = heightLeft - imgHeight;
-          pdf.addPage();
-          pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-          heightLeft -= pageHeight;
-        }
-
-        // Salvar PDF
-        const fileName = `${(title || "document").replace(/[^a-z0-9._-]/gi, "_")}${versionLabel}.pdf`;
-        pdf.save(fileName);
-        
-        console.log("PDF gerado com sucesso:", fileName);
-      } catch (error: any) {
-        // Limpar elementos temporários em caso de erro
-        const tempDivElement = document.getElementById("pdf-export-temp");
-        if (tempDivElement && document.body.contains(tempDivElement)) {
-          document.body.removeChild(tempDivElement);
-        }
-        const styleElement = document.querySelector('style[data-pdf-export]');
-        if (styleElement && document.head.contains(styleElement)) {
-          document.head.removeChild(styleElement);
-        }
-        
-        console.error("Erro detalhado ao exportar PDF:", error);
-        const errorMessage = error?.message || "Erro desconhecido ao exportar PDF";
-        throw new Error(errorMessage);
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: "Failed to export PDF" }));
+        throw new Error(errorData.error || "Failed to export PDF");
       }
+
+      // Obter o blob do PDF
+      const blob = await response.blob();
+      
+      // Criar URL temporária e fazer download
+      const url = window.URL.createObjectURL(blob);
+      const a = window.document.createElement("a");
+      a.href = url;
+      const fileName = `${(title || "document").replace(/[^a-z0-9._-]/gi, "_")}${versionId ? `_v${versions.find(v => v.id === versionId)?.versionNumber || ''}` : ''}.pdf`;
+      a.download = fileName;
+      window.document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      window.document.body.removeChild(a);
     },
     onSuccess: () => {
       toast({
@@ -642,120 +621,335 @@ export default function DocumentEditor({
               <label className="text-sm font-medium mb-2 block">
                 {t("editor.client")}
               </label>
-              <div className="flex gap-2">
-                <Select
-                  value={company || undefined}
-                  onValueChange={(value) => setCompany(value)}
+              <Popover open={clientPopoverOpen} onOpenChange={setClientPopoverOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    ref={clientTriggerRef}
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={clientPopoverOpen}
+                    className="w-full justify-between"
+                    data-testid="select-client"
+                  >
+                    {company || t("editor.selectClient")}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent 
+                  className="p-0"
+                  style={{ width: clientPopoverWidth ? `${clientPopoverWidth}px` : undefined }}
+                  align="start"
                 >
-                  <SelectTrigger data-testid="select-client" className="flex-1">
-                    <SelectValue placeholder={t("editor.selectClient")} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {existingClients.length > 0 ? (
-                      existingClients.map((client) => (
-                        <SelectItem key={client} value={client}>
-                          {client}
-                        </SelectItem>
-                      ))
-                    ) : (
-                      <SelectItem value="" disabled>
-                        {t("editor.noClientFound")}
-                      </SelectItem>
-                    )}
-                  </SelectContent>
-                </Select>
-                <Popover open={clientPopoverOpen} onOpenChange={setClientPopoverOpen}>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" size="icon" className="shrink-0">
-                      <Plus className="h-4 w-4" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-[300px]">
-                    <div className="space-y-4">
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">
-                          {t("editor.createClient", { name: "" }).replace(/"/g, "")}
-                        </label>
-                        <Input
-                          placeholder={t("editor.clientPlaceholder")}
-                          value={clientSearch}
-                          onChange={(e) => setClientSearch(e.target.value)}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter" && clientSearch.trim()) {
-                              const newClient = clientSearch.trim();
-                              setCompany(newClient);
-                              // Add to local clients list if not already there
-                              setLocalClients((prev) => {
-                                if (!prev.includes(newClient)) {
-                                  return [...prev, newClient].sort();
+                  <Command>
+                    <CommandInput
+                      placeholder={t("editor.searchOrCreateClient", "Buscar ou digite para criar cliente...")}
+                      value={clientSearch}
+                      onValueChange={setClientSearch}
+                    />
+                    <CommandList>
+                      <CommandEmpty>
+                        {clientSearch.trim() ? (
+                          <div className="p-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="w-full justify-start"
+                              onClick={async () => {
+                                const newClient = clientSearch.trim();
+                                if (newClient && !existingClients.find(c => c.name === newClient)) {
+                                  await createClientMutation.mutateAsync(newClient);
                                 }
-                                return prev;
-                              });
-                              setClientPopoverOpen(false);
-                              setClientSearch("");
-                            }
-                          }}
-                        />
-                      </div>
-                      <Button
-                        className="w-full"
-                        onClick={() => {
-                          if (clientSearch.trim()) {
-                            const newClient = clientSearch.trim();
-                            setCompany(newClient);
-                            // Add to local clients list if not already there
-                            setLocalClients((prev) => {
-                              if (!prev.includes(newClient)) {
-                                return [...prev, newClient].sort();
-                              }
-                              return prev;
-                            });
-                            setClientPopoverOpen(false);
-                            setClientSearch("");
-                          }
-                        }}
-                        disabled={!clientSearch.trim()}
-                      >
-                        {t("editor.create")}
-                      </Button>
-                    </div>
+                                setCompany(newClient);
+                                setClientPopoverOpen(false);
+                                setClientSearch("");
+                              }}
+                              disabled={createClientMutation.isPending}
+                            >
+                              <Plus className="mr-2 h-4 w-4" />
+                              {t("editor.createClient", { name: clientSearch })}
+                            </Button>
+                          </div>
+                        ) : (
+                          <div className="flex flex-col items-center justify-center py-6 px-4 text-center">
+                            <Building2 className="h-10 w-10 text-muted-foreground/50 mb-3" />
+                            <p className="text-sm font-medium mb-1">{t("editor.noClientFound")}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {t("editor.typeToCreate", "Digite o nome do cliente para criar um novo")}
+                            </p>
+                          </div>
+                        )}
+                      </CommandEmpty>
+                        <CommandGroup>
+                          {existingClients.map((client) => {
+                            return (
+                              <CommandItem
+                                key={client.name}
+                                value={client.name}
+                                onSelect={() => {
+                                  setCompany(client.name === company ? "" : client.name);
+                                  setClientPopoverOpen(false);
+                                  setClientSearch("");
+                                }}
+                                className="flex items-center justify-between"
+                              >
+                                <div className="flex items-center gap-2 flex-1">
+                                  <Check
+                                    className={cn(
+                                      "h-4 w-4",
+                                      company === client.name ? "opacity-100" : "opacity-0"
+                                    )}
+                                  />
+                                  <span>{client.name}</span>
+                                </div>
+                                <button
+                                  onClick={async (e) => {
+                                    e.stopPropagation();
+                                    try {
+                                      let clientId = client.id;
+                                      
+                                      // Se não é customizado, criar como customizado primeiro
+                                      if (!clientId) {
+                                        const newClient = await createClientMutation.mutateAsync(client.name);
+                                        clientId = newClient.id;
+                                        // Invalidar queries para atualizar a lista
+                                        queryClient.invalidateQueries({ queryKey: ["/api/custom-clients"] });
+                                        // Aguardar um pouco para garantir que a query foi atualizada
+                                        await new Promise(resolve => setTimeout(resolve, 100));
+                                      }
+                                      
+                                      // Excluir o cliente
+                                      await deleteClientMutation.mutateAsync(clientId);
+                                      
+                                      if (company === client.name) {
+                                        setCompany("");
+                                      }
+                                    } catch (error: any) {
+                                      console.error("Error deleting client:", error);
+                                      
+                                      // Extrair código de erro (pode estar em error.error ou parsear da mensagem)
+                                      let errorCode = error?.error;
+                                      
+                                      // Se não encontrou em error.error, tentar parsear da mensagem
+                                      if (!errorCode && error?.message) {
+                                        try {
+                                          const match = error.message.match(/\{"error":"([^"]+)"\}/);
+                                          if (match) {
+                                            errorCode = match[1];
+                                          }
+                                        } catch (e) {
+                                          // Ignorar erro de parsing
+                                        }
+                                      }
+                                      
+                                      // Mapear códigos de erro para chaves de tradução
+                                      let errorMessage = t("filters.errorDeletingClient", "Erro ao remover cliente");
+                                      
+                                      if (errorCode === "CLIENT_NOT_FOUND") {
+                                        errorMessage = t("filters.clientNotFound", "Cliente não encontrado ou você não tem permissão para excluí-lo");
+                                      } else if (errorCode === "CLIENT_IN_USE") {
+                                        errorMessage = t("filters.clientInUseCannotDelete", "Este cliente não pode ser excluído porque está sendo usado em um ou mais documentos. Remova o cliente dos documentos antes de excluí-lo.");
+                                      } else if (errorCode === "CLIENT_DELETE_FAILED") {
+                                        errorMessage = t("filters.clientDeleteFailed", "Falha ao excluir o cliente. Tente novamente mais tarde.");
+                                      } else if (error?.message && !error.message.includes("{")) {
+                                        // Só usar a mensagem se não for JSON
+                                        errorMessage = error.message;
+                                      }
+                                      
+                                      toast({
+                                        title: errorMessage,
+                                        variant: "destructive",
+                                        duration: errorCode === "CLIENT_IN_USE" ? 6000 : 5000,
+                                      });
+                                    }
+                                  }}
+                                  className="ml-2 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                                  title={t("filters.removeClient", "Remover cliente")}
+                                  disabled={deleteClientMutation.isPending || createClientMutation.isPending}
+                                >
+                                  <X className="h-3 w-3" />
+                                </button>
+                              </CommandItem>
+                            );
+                          })}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
                   </PopoverContent>
                 </Popover>
-              </div>
             </div>
             <div className="flex-1 min-w-[150px]">
               <label className="text-sm font-medium mb-2 block">
                 {t("editor.category")}
               </label>
-              <Select value={category} onValueChange={setCategory}>
-                <SelectTrigger data-testid="select-category">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {documentCategories.map((cat) => (
-                    <SelectItem key={cat.value} value={cat.value}>
-                      {cat.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Popover open={categoryPopoverOpen} onOpenChange={setCategoryPopoverOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    ref={categoryTriggerRef}
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={categoryPopoverOpen}
+                    className="w-full justify-between"
+                    data-testid="select-category"
+                  >
+                    {category
+                      ? allCategories.find((cat) => cat.value === category)?.label || category
+                      : t("editor.selectCategory", "Selecionar Categoria")}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent 
+                  className="p-0"
+                  style={{ width: categoryPopoverWidth ? `${categoryPopoverWidth}px` : undefined }}
+                  align="start"
+                >
+                  <Command>
+                    <CommandInput
+                      placeholder={t("editor.searchOrCreateCategory", "Buscar ou digite para criar categoria...")}
+                      value={categorySearch}
+                      onValueChange={setCategorySearch}
+                    />
+                    <CommandList>
+                      <CommandEmpty>
+                        {categorySearch.trim() ? (
+                          <div className="p-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="w-full justify-start"
+                              onClick={async () => {
+                                const newCategory = categorySearch.trim();
+                                if (newCategory && !allCategories.find(c => c.value === newCategory.toLowerCase())) {
+                                  await createCategoryMutation.mutateAsync(newCategory);
+                                }
+                                setCategory(newCategory.toLowerCase());
+                                setCategoryPopoverOpen(false);
+                                setCategorySearch("");
+                                // Don't load template for new custom categories
+                                setContent("");
+                              }}
+                              disabled={createCategoryMutation.isPending}
+                            >
+                              <Plus className="mr-2 h-4 w-4" />
+                              {t("editor.createCategory", { name: categorySearch })}
+                            </Button>
+                          </div>
+                        ) : (
+                          <div className="flex flex-col items-center justify-center py-6 px-4 text-center">
+                            <FolderOpen className="h-10 w-10 text-muted-foreground/50 mb-3" />
+                            <p className="text-sm font-medium mb-1">{t("editor.noCategoryFound")}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {t("editor.typeToCreateCategory", "Digite o nome da categoria para criar uma nova")}
+                            </p>
+                          </div>
+                        )}
+                      </CommandEmpty>
+                      <CommandGroup>
+                        {allCategories.map((cat) => (
+                          <CommandItem
+                            key={cat.value}
+                            value={cat.value}
+                            onSelect={() => {
+                              setCategory(cat.value === category ? "" : cat.value);
+                              setCategoryPopoverOpen(false);
+                              setCategorySearch("");
+                            }}
+                            className="flex items-center justify-between"
+                          >
+                            <div className="flex items-center gap-2 flex-1">
+                              <Check
+                                className={cn(
+                                  "h-4 w-4",
+                                  category === cat.value ? "opacity-100" : "opacity-0"
+                                )}
+                              />
+                              <span>{cat.label}</span>
+                            </div>
+                            {cat.isCustom && cat.id && (
+                              <button
+                                onClick={async (e) => {
+                                  e.stopPropagation();
+                                  if (cat.id) {
+                                    try {
+                                      await deleteCategoryMutation.mutateAsync(cat.id);
+                                      if (category === cat.value) {
+                                        setCategory("");
+                                      }
+                                    } catch (error: any) {
+                                      if (error?.error === "Category is in use and cannot be deleted") {
+                                        toast({
+                                          title: t("filters.categoryInUse", "Categoria em uso em documentos"),
+                                          variant: "destructive",
+                                        });
+                                      }
+                                    }
+                                  }
+                                }}
+                                className="ml-2 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                                title={t("filters.removeCategory", "Remover categoria")}
+                                disabled={deleteCategoryMutation.isPending}
+                              >
+                                <X className="h-3 w-3" />
+                              </button>
+                            )}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </div>
             <div className="flex-1 min-w-[150px]">
               <label className="text-sm font-medium mb-2 block">
                 {t("editor.status")}
               </label>
-              <Select value={status} onValueChange={setStatus}>
-                <SelectTrigger data-testid="select-status">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {documentStatuses.map((stat) => (
-                    <SelectItem key={stat.value} value={stat.value}>
-                      {stat.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Popover open={statusPopoverOpen} onOpenChange={setStatusPopoverOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    ref={statusTriggerRef}
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={statusPopoverOpen}
+                    className="w-full justify-between"
+                    data-testid="select-status"
+                  >
+                    {status
+                      ? documentStatuses.find((stat) => stat.value === status)?.label || status
+                      : t("editor.selectStatus", "Selecionar Status")}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent 
+                  className="p-0"
+                  style={{ width: statusPopoverWidth ? `${statusPopoverWidth}px` : undefined }}
+                  align="start"
+                >
+                  <Command>
+                    <CommandList>
+                      <CommandGroup>
+                        {documentStatuses.map((stat) => (
+                          <CommandItem
+                            key={stat.value}
+                            value={stat.value}
+                            onSelect={() => {
+                              setStatus(stat.value === status ? "" : stat.value);
+                              setStatusPopoverOpen(false);
+                            }}
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                status === stat.value ? "opacity-100" : "opacity-0"
+                              )}
+                            />
+                            {stat.label}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
 

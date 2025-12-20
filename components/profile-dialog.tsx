@@ -16,6 +16,7 @@ import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Spinner } from "@/components/ui/spinner";
 import { useToast } from "@/hooks/use-toast";
+import { getInitials } from "@/lib/user-utils";
 import type { User as UserType } from "@shared/schema";
 
 interface ProfileDialogProps {
@@ -71,7 +72,30 @@ async function compressImage(file: File, maxSize: number = 150): Promise<string>
 export function ProfileDialog({ user, open, onOpenChange }: ProfileDialogProps) {
   const { t } = useTranslation("auth");
   const { t: tCommon } = useTranslation("common");
-  const [displayName, setDisplayName] = useState(user.displayName || user.username);
+  
+  if (!user) {
+    return null;
+  }
+  
+  // Separar displayName existente em firstName e lastName se disponível
+  const getInitialNameParts = () => {
+    if (user.firstName) {
+      return { firstName: user.firstName, lastName: user.lastName || "" };
+    }
+    // Se não tiver firstName, tentar separar displayName
+    if (user.displayName) {
+      const parts = user.displayName.trim().split(" ");
+      return {
+        firstName: parts[0] || "",
+        lastName: parts.slice(1).join(" ") || "",
+      };
+    }
+    return { firstName: user.username, lastName: "" };
+  };
+  
+  const initialParts = getInitialNameParts();
+  const [firstName, setFirstName] = useState(initialParts.firstName);
+  const [lastName, setLastName] = useState(initialParts.lastName);
   const [avatarPreview, setAvatarPreview] = useState(user.avatarUrl || "");
   const [avatarFile, setAvatarFile] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -106,14 +130,16 @@ export function ProfileDialog({ user, open, onOpenChange }: ProfileDialogProps) 
   // Reset state when dialog opens
   useEffect(() => {
     if (open) {
-      setDisplayName(user.displayName || user.username);
+      const parts = getInitialNameParts();
+      setFirstName(parts.firstName);
+      setLastName(parts.lastName);
       setAvatarPreview(user.avatarUrl || "");
       setAvatarFile(null);
     }
   }, [open, user]);
 
   const updateProfileMutation = useMutation({
-    mutationFn: async (data: { displayName?: string; avatarUrl?: string | null }) => {
+    mutationFn: async (data: { firstName?: string; lastName?: string; avatarUrl?: string | null }) => {
       const response = await fetch("/api/auth/profile", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -207,17 +233,14 @@ export function ProfileDialog({ user, open, onOpenChange }: ProfileDialogProps) 
     const avatarUrl = avatarFile !== null ? (avatarFile || null) : (avatarPreview || null);
     
     updateProfileMutation.mutate({
-      displayName: displayName.trim() || undefined,
+      firstName: firstName.trim() || undefined,
+      lastName: lastName.trim() || undefined,
       avatarUrl,
     });
   };
 
-  const initials = (displayName || user.username)
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
+  const displayName = firstName && lastName ? `${firstName} ${lastName}` : firstName || user.username;
+  const initials = getInitials({ firstName, lastName, displayName: null, username: user.username });
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -290,18 +313,30 @@ export function ProfileDialog({ user, open, onOpenChange }: ProfileDialogProps) 
             </div>
           </div>
 
-          {/* Display Name */}
+          {/* First Name */}
           <div className="grid gap-2">
-            <Label htmlFor="displayName">{t("profile.displayName")}</Label>
+            <Label htmlFor="firstName">{t("profile.firstName", "Nome")}</Label>
             <Input
-              id="displayName"
-              value={displayName}
-              onChange={(e) => setDisplayName(e.target.value)}
-              placeholder={t("profile.displayNamePlaceholder")}
-              maxLength={100}
+              id="firstName"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              placeholder={t("profile.firstNamePlaceholder", "Seu primeiro nome")}
+              maxLength={50}
+            />
+          </div>
+
+          {/* Last Name */}
+          <div className="grid gap-2">
+            <Label htmlFor="lastName">{t("profile.lastName", "Sobrenome")}</Label>
+            <Input
+              id="lastName"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              placeholder={t("profile.lastNamePlaceholder", "Seu sobrenome")}
+              maxLength={50}
             />
             <p className="text-xs text-muted-foreground">
-              {t("profile.displayNameHint")}
+              {t("profile.nameHint", "Este nome será exibido nos documentos e comentários.")}
             </p>
           </div>
         </div>

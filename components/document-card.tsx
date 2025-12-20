@@ -25,6 +25,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useRelativeTime } from "@/lib/date-utils";
+import { getFirstName } from "@/lib/user-utils";
 import type { Document } from "@shared/schema";
 
 interface DocumentCardProps {
@@ -56,11 +57,15 @@ export function DocumentCard({ document, onDelete, index = 0, canDelete = false 
   const statusColor = statusColors[document.status as keyof typeof statusColors] || statusColors.draft;
 
   const getCategoryLabel = (category: string) => {
-    // Tentar traduzir a categoria, se não encontrar, retornar a categoria original
+    // Tentar traduzir a categoria, se não encontrar, capitalizar a primeira letra
     const translationKey = `categories.${category}`;
     const translated = t(translationKey);
     // Se a tradução retornar a própria chave, significa que não existe tradução
-    return translated !== translationKey ? translated : category;
+    if (translated !== translationKey) {
+      return translated;
+    }
+    // Capitalizar primeira letra para categorias customizadas
+    return category.charAt(0).toUpperCase() + category.slice(1).toLowerCase();
   };
 
   const getStatusLabel = (status: string) => {
@@ -229,7 +234,7 @@ export function DocumentCard({ document, onDelete, index = 0, canDelete = false 
             <div className="flex items-center gap-4 text-xs text-muted-foreground mt-auto">
               <div className="flex items-center gap-1">
                 <User className="h-3 w-3" />
-                <span>{document.authorName}</span>
+                <span>{getFirstName({ firstName: null, lastName: null, displayName: null, username: document.authorName })}</span>
               </div>
               <div className="flex items-center gap-1">
                 <Clock className="h-3 w-3" />

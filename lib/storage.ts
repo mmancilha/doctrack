@@ -10,11 +10,17 @@ import {
   type AuditLog,
   type InsertAuditLog,
   type SearchQuery,
+  type CustomCategory,
+  type InsertCustomCategory,
+  type CustomClient,
+  type InsertCustomClient,
   users,
   documents,
   versions,
   comments,
   auditLogs,
+  customCategories,
+  customClients,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, or, ilike, sql } from "drizzle-orm";
@@ -46,6 +52,14 @@ export interface IStorage {
 
   getAuditLogs(documentId?: string): Promise<AuditLog[]>;
   createAuditLog(log: InsertAuditLog): Promise<AuditLog>;
+
+  getCustomCategories(userId: string): Promise<CustomCategory[]>;
+  createCustomCategory(category: InsertCustomCategory): Promise<CustomCategory>;
+  deleteCustomCategory(id: string, userId: string): Promise<boolean>;
+
+  getCustomClients(userId: string): Promise<CustomClient[]>;
+  createCustomClient(client: InsertCustomClient): Promise<CustomClient>;
+  deleteCustomClient(id: string, userId: string): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -285,6 +299,48 @@ export class DatabaseStorage implements IStorage {
   async createAuditLog(insertLog: InsertAuditLog): Promise<AuditLog> {
     const [log] = await db.insert(auditLogs).values(insertLog).returning();
     return log;
+  }
+
+  async getCustomCategories(userId: string): Promise<CustomCategory[]> {
+    return await db
+      .select()
+      .from(customCategories)
+      .where(eq(customCategories.userId, userId))
+      .orderBy(customCategories.name);
+  }
+
+  async createCustomCategory(category: InsertCustomCategory): Promise<CustomCategory> {
+    const [created] = await db.insert(customCategories).values(category).returning();
+    return created;
+  }
+
+  async deleteCustomCategory(id: string, userId: string): Promise<boolean> {
+    const result = await db
+      .delete(customCategories)
+      .where(and(eq(customCategories.id, id), eq(customCategories.userId, userId)))
+      .returning();
+    return result.length > 0;
+  }
+
+  async getCustomClients(userId: string): Promise<CustomClient[]> {
+    return await db
+      .select()
+      .from(customClients)
+      .where(eq(customClients.userId, userId))
+      .orderBy(customClients.name);
+  }
+
+  async createCustomClient(client: InsertCustomClient): Promise<CustomClient> {
+    const [created] = await db.insert(customClients).values(client).returning();
+    return created;
+  }
+
+  async deleteCustomClient(id: string, userId: string): Promise<boolean> {
+    const result = await db
+      .delete(customClients)
+      .where(and(eq(customClients.id, id), eq(customClients.userId, userId)))
+      .returning();
+    return result.length > 0;
   }
 }
 

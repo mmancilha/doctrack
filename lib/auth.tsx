@@ -8,8 +8,10 @@ interface User {
   id: string;
   username: string;
   role: string;
-  displayName: string | null;
-  avatarUrl: string | null;
+  firstName: string | null | undefined;
+  lastName: string | null | undefined;
+  displayName: string | null | undefined; // Mantido para compatibilidade
+  avatarUrl: string | null | undefined;
 }
 
 interface AuthContextType {
@@ -36,7 +38,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const loginMutation = useMutation({
     mutationFn: async ({ username, password }: { username: string; password: string }) => {
       const response = await apiRequest("POST", "/api/auth/login", { username, password });
-      return response.json();
+      const userData = await response.json();
+      // Garantir que os dados do usuário estão no formato correto
+      return {
+        id: userData.id,
+        username: userData.username,
+        role: userData.role,
+        firstName: userData.firstName ?? null,
+        lastName: userData.lastName ?? null,
+        displayName: userData.displayName ?? null,
+        avatarUrl: userData.avatarUrl ?? null,
+      } as User;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });

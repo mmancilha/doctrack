@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
-import { FileText, Search, X, Calendar } from "lucide-react";
+import { FileText, Search, X, Calendar, Check, ChevronsUpDown, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -15,6 +15,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import { cn } from "@/lib/utils";
 import { DocumentCard } from "@/components/document-card";
 import { EmptyState } from "@/components/empty-state";
 import { DocumentListSkeleton } from "@/components/loading-skeleton";
@@ -31,12 +45,33 @@ export default function Documents() {
   const router = useRouter();
   const { canEdit, canDelete } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [categoryFilter, setCategoryFilter] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [dateFilter, setDateFilter] = useState<string>("all");
+  const [categoryPopoverOpen, setCategoryPopoverOpen] = useState(false);
+  const [categorySearch, setCategorySearch] = useState("");
+  const [customCategories, setCustomCategories] = useState<string[]>([]);
+  const categoryTriggerRef = useRef<HTMLButtonElement>(null);
+  const [categoryPopoverWidth, setCategoryPopoverWidth] = useState<number | undefined>(undefined);
+
+  // Measure trigger width when popover opens
+  useEffect(() => {
+    if (categoryPopoverOpen && categoryTriggerRef.current) {
+      setCategoryPopoverWidth(categoryTriggerRef.current.offsetWidth);
+    }
+  }, [categoryPopoverOpen]);
   
   const DOCUMENT_CATEGORIES = useDocumentCategories();
   const DOCUMENT_STATUSES = useDocumentStatuses();
+  
+  // Combine default categories with custom ones
+  const allCategories = [
+    ...DOCUMENT_CATEGORIES,
+    ...customCategories.filter(cat => !DOCUMENT_CATEGORIES.find(dc => dc.value === cat.toLowerCase())).map(cat => ({
+      value: cat.toLowerCase(),
+      label: cat,
+    })),
+  ];
 
   const DATE_FILTERS = [
     { value: "all", label: t("filters.allTime", "All time") },
@@ -87,7 +122,7 @@ export default function Documents() {
       doc.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
       doc.authorName.toLowerCase().includes(searchQuery.toLowerCase());
 
-    const matchesCategory = categoryFilter === "all" || doc.category === categoryFilter;
+    const matchesCategory = !categoryFilter || categoryFilter === "" || doc.category === categoryFilter;
     const matchesStatus = statusFilter === "all" || doc.status === statusFilter;
     
     const dateThreshold = getDateFilterRange(dateFilter);
@@ -96,11 +131,11 @@ export default function Documents() {
     return matchesSearch && matchesCategory && matchesStatus && matchesDate;
   });
 
-  const hasActiveFilters = categoryFilter !== "all" || statusFilter !== "all" || dateFilter !== "all" || searchQuery !== "";
+  const hasActiveFilters = categoryFilter !== "" || statusFilter !== "all" || dateFilter !== "all" || searchQuery !== "";
 
   const clearFilters = () => {
     setSearchQuery("");
-    setCategoryFilter("all");
+    setCategoryFilter("");
     setStatusFilter("all");
     setDateFilter("all");
   };
@@ -150,19 +185,86 @@ export default function Documents() {
           />
         </div>
         <div className="flex gap-2">
-          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-            <SelectTrigger className="w-[140px]" data-testid="select-category">
-              <SelectValue placeholder={t("editor.category")} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{t("filters.allCategories", "All Categories")}</SelectItem>
-              {DOCUMENT_CATEGORIES.map((cat) => (
-                <SelectItem key={cat.value} value={cat.value}>
-                  {cat.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Popover open={categoryPopoverOpen} onOpenChange={setCategoryPopoverOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                ref={categoryTriggerRef}
+                variant="outline"
+                role="combobox"
+                aria-expanded={categoryPopoverOpen}
+                className="w-[140px] justify-between"
+                data-testid="select-category"
+              >
+                {categoryFilter
+                  ? allCategories.find((cat) => cat.value === categoryFilter)?.label || categoryFilter
+                  : t("editor.category")}
+                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent 
+              className="p-0"
+              style={{ width: categoryPopoverWidth ? `${categoryPopoverWidth}px` : undefined }}
+              align="start"
+            >
+              <Command>
+                <CommandInput
+                  placeholder={t("editor.searchCategory", "Search category...")}
+                  value={categorySearch}
+                  onValueChange={setCategorySearch}
+                />
+                <CommandList>
+                  <CommandEmpty>
+                    {categorySearch.trim() ? (
+                      <div className="p-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="w-full justify-start"
+                          onClick={() => {
+                            const newCategory = categorySearch.trim();
+                            if (newCategory && !customCategories.includes(newCategory)) {
+                              setCustomCategories((prev) => [...prev, newCategory]);
+                            }
+                            setCategoryFilter(newCategory.toLowerCase());
+                            setCategoryPopoverOpen(false);
+                            setCategorySearch("");
+                          }}
+                        >
+                          <Plus className="mr-2 h-4 w-4" />
+                          {t("editor.createCategory", { name: categorySearch })}
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="py-6 text-center text-sm text-muted-foreground">
+                        {t("editor.noCategoryFound", "No category found")}
+                      </div>
+                    )}
+                  </CommandEmpty>
+                  <CommandGroup>
+                    {allCategories.map((cat) => (
+                      <CommandItem
+                        key={cat.value}
+                        value={cat.value}
+                        onSelect={() => {
+                          setCategoryFilter(cat.value === categoryFilter ? "" : cat.value);
+                          setCategoryPopoverOpen(false);
+                          setCategorySearch("");
+                        }}
+                      >
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            categoryFilter === cat.value ? "opacity-100" : "opacity-0"
+                          )}
+                        />
+                        {cat.label}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-[130px]" data-testid="select-status">
               <SelectValue placeholder={t("editor.status")} />
@@ -207,10 +309,10 @@ export default function Documents() {
               </button>
             </Badge>
           )}
-          {categoryFilter !== "all" && (
+          {categoryFilter && categoryFilter !== "" && (
             <Badge variant="secondary" className="gap-1">
-              {t("editor.category")}: {categoryFilter}
-              <button onClick={() => setCategoryFilter("all")}>
+              {t("editor.category")}: {allCategories.find((cat) => cat.value === categoryFilter)?.label || categoryFilter}
+              <button onClick={() => setCategoryFilter("")}>
                 <X className="h-3 w-3" />
               </button>
             </Badge>

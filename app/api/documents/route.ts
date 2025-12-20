@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth-helpers";
 import { storage } from "@/lib/storage";
 import { insertDocumentSchema, searchQuerySchema } from "@shared/schema";
+import { getFullName } from "@/lib/user-helpers";
 import { z } from "zod";
 
 export async function GET(request: NextRequest) {
@@ -61,7 +62,7 @@ export async function POST(request: NextRequest) {
     const validatedData = insertDocumentSchema.parse({
       ...body,
       authorId: user.id,
-      authorName: user.username,
+      authorName: getFullName(user),
     });
 
     const document = await storage.createDocument(validatedData);
@@ -69,7 +70,7 @@ export async function POST(request: NextRequest) {
     await storage.createAuditLog({
       documentId: document.id,
       userId: user.id,
-      userName: user.username,
+      userName: getFullName(user),
       action: "created",
       details: `Created document: ${document.title}`,
     });

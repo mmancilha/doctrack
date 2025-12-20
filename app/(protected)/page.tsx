@@ -56,7 +56,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="p-6 space-y-8">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 p-6 space-y-8">
       <div>
         <motion.h1
           initial={{ opacity: 0, y: -10 }}

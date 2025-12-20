@@ -12,10 +12,34 @@ export async function PATCH(request: NextRequest) {
 
     const { user } = authResult;
     const body = await request.json();
-    const { displayName, avatarUrl } = body;
+    const { firstName, lastName, displayName, avatarUrl } = body;
 
-    const updates: { displayName?: string; avatarUrl?: string | null } = {};
+    const updates: { firstName?: string; lastName?: string; displayName?: string; avatarUrl?: string | null } = {};
 
+    if (firstName !== undefined) {
+      if (
+        typeof firstName === "string" &&
+        firstName.trim().length > 0 &&
+        firstName.length <= 50
+      ) {
+        updates.firstName = firstName.trim();
+      } else if (firstName === "" || firstName === null) {
+        updates.firstName = undefined;
+      }
+    }
+
+    if (lastName !== undefined) {
+      if (
+        typeof lastName === "string" &&
+        lastName.length <= 50
+      ) {
+        updates.lastName = lastName.trim() || undefined;
+      } else if (lastName === "" || lastName === null) {
+        updates.lastName = undefined;
+      }
+    }
+
+    // Mantido para compatibilidade durante migração
     if (displayName !== undefined) {
       if (
         typeof displayName === "string" &&
@@ -77,7 +101,9 @@ export async function PATCH(request: NextRequest) {
       id: updatedUser.id,
       username: updatedUser.username,
       role: updatedUser.role,
-      displayName: updatedUser.displayName,
+      firstName: updatedUser.firstName,
+      lastName: updatedUser.lastName,
+      displayName: updatedUser.displayName, // Mantido para compatibilidade
       avatarUrl: updatedUser.avatarUrl,
     };
 

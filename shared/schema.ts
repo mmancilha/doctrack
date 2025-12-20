@@ -8,7 +8,9 @@ export const users = pgTable("users", {
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
   role: text("role").notNull().default("editor"),
-  displayName: text("display_name"),
+  firstName: text("first_name"),
+  lastName: text("last_name"),
+  displayName: text("display_name"), // Mantido para compatibilidade durante migração
   avatarUrl: text("avatar_url"),
 });
 
@@ -16,12 +18,16 @@ export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
   role: true,
-  displayName: true,
+  firstName: true,
+  lastName: true,
+  displayName: true, // Mantido para compatibilidade
   avatarUrl: true,
 });
 
 export const updateProfileSchema = z.object({
-  displayName: z.string().min(1).max(100).optional(),
+  firstName: z.string().min(1).max(50).optional(),
+  lastName: z.string().max(50).optional(),
+  displayName: z.string().min(1).max(100).optional(), // Mantido para compatibilidade
   avatarUrl: z.string().url().optional().nullable(),
 });
 
@@ -119,3 +125,33 @@ export const searchQuerySchema = z.object({
 });
 
 export type SearchQuery = z.infer<typeof searchQuerySchema>;
+
+export const customCategories = pgTable("custom_categories", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  userId: varchar("user_id").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const insertCustomCategorySchema = createInsertSchema(customCategories).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertCustomCategory = z.infer<typeof insertCustomCategorySchema>;
+export type CustomCategory = typeof customCategories.$inferSelect;
+
+export const customClients = pgTable("custom_clients", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  userId: varchar("user_id").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const insertCustomClientSchema = createInsertSchema(customClients).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertCustomClient = z.infer<typeof insertCustomClientSchema>;
+export type CustomClient = typeof customClients.$inferSelect;

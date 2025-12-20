@@ -25,14 +25,26 @@
     "titlePlaceholder": "Título do documento...",
     "contentPlaceholder": "Comece a escrever seu documento...",
     "category": "Categoria",
+    "selectCategory": "Selecionar Categoria",
     "status": "Status",
+    "selectStatus": "Selecionar Status",
+    "searchStatus": "Buscar status...",
+    "noStatusFound": "Nenhum status encontrado",
     "client": "Cliente",
     "clientPlaceholder": "Selecione ou digite o nome do cliente...",
     "selectClient": "Selecionar cliente",
     "searchClient": "Buscar cliente...",
+    "searchOrCreateClient": "Buscar ou digite para criar cliente...",
     "noClientFound": "Nenhum cliente encontrado.",
     "createClient": "Criar cliente \"{{name}}\"",
     "existingClients": "Clientes existentes",
+    "typeToCreate": "Digite o nome do cliente para criar um novo",
+    "clientHint": "Digite para buscar ou criar um novo cliente",
+    "searchCategory": "Buscar categoria...",
+    "searchOrCreateCategory": "Buscar ou digite para criar categoria...",
+    "noCategoryFound": "Nenhuma categoria encontrada",
+    "createCategory": "Criar categoria \"{{name}}\"",
+    "typeToCreateCategory": "Digite o nome da categoria para criar uma nova",
           "save": "Salvar",
           "saving": "Salvando...",
           "exporting": "Exportando...",
@@ -57,6 +69,29 @@
     "description": "Esta ação é irreversível. O documento será removido permanentemente do sistema.",
     "cancel": "Cancelar",
     "confirm": "Excluir"
+  },
+  "table": {
+    "allDocuments": "Todos os Documentos",
+    "description": "Gerencie e visualize todos os seus documentos em uma tabela",
+    "search": "Buscar documentos...",
+    "title": "Título",
+    "noTitle": "Sem título",
+    "author": "Autor",
+    "updated": "Atualizado",
+    "openMenu": "Abrir menu",
+    "actions": "Ações",
+    "view": "Ver",
+    "noResults": "Nenhum resultado encontrado.",
+    "noDocuments": "Nenhum documento encontrado",
+    "noDocumentsDescription": "Comece criando um novo documento",
+    "showing": "Mostrando",
+    "to": "até",
+    "of": "de",
+    "results": "resultados",
+    "page": "Página",
+    "previous": "Anterior",
+    "next": "Próxima",
+    "rowsPerPage": "Linhas por página"
   },
   "toast": {
     "created": {
@@ -178,12 +213,311 @@
     "allCategories": "Todas as Categorias",
     "allStatuses": "Todos os Status",
     "date": "Data",
+    "dateRange": "Período",
+    "startDate": "Data Inicial",
+    "endDate": "Data Final",
     "activeFilters": "Filtros ativos",
     "search": "Busca",
     "clearAll": "Limpar tudo",
     "showing": "Exibindo",
     "documents": "documentos",
-    "document": "documento"
+    "document": "documento",
+    "removeCategory": "Remover categoria",
+    "removeClient": "Remover cliente",
+    "clientInUse": "Cliente em uso em documentos",
+    "hideClient": "Ocultar cliente",
+    "categoryInUse": "Categoria padrão não pode ser removida",
+    "errorDeletingClient": "Erro ao remover cliente",
+    "clientNotFound": "Cliente não encontrado ou você não tem permissão para excluí-lo",
+    "clientInUseCannotDelete": "Este cliente não pode ser excluído porque está sendo usado em um ou mais documentos. Remova o cliente dos documentos antes de excluí-lo.",
+    "clientDeleteFailed": "Falha ao excluir o cliente. Tente novamente mais tarde.",
+    "clientDeleteSuccess": "Cliente removido com sucesso"
+  },
+  "templates": {
+    "manual": {
+      "title": "Manual de Operações",
+      "intro": "Este manual descreve os procedimentos e diretrizes para operações e processos da organização.",
+      "section1": {
+        "title": "1. Introdução",
+        "content": "Adicione informações introdutórias sobre o manual aqui."
+      },
+      "section2": {
+        "title": "2. Procedimentos",
+        "content": "Descreva os procedimentos principais:",
+        "item1": "Procedimento 1",
+        "item2": "Procedimento 2",
+        "item3": "Procedimento 3"
+      },
+      "section3": {
+        "title": "3. Conclusão",
+        "content": "Adicione informações finais e considerações importantes aqui."
+      }
+    },
+    "checklist": {
+      "title": "Checklist",
+      "intro": "Use este checklist para garantir que todos os itens sejam verificados e concluídos de forma sistemática.",
+      "section1": {
+        "title": "Itens Principais",
+        "item1": "Verificar requisitos iniciais",
+        "item2": "Confirmar documentação necessária",
+        "item3": "Validar informações básicas",
+        "item4": "Revisar conformidade com padrões",
+        "item5": "Confirmar aprovações necessárias"
+      },
+      "section2": {
+        "title": "Itens Secundários",
+        "item1": "Verificar detalhes adicionais",
+        "item2": "Confirmar comunicação com partes interessadas",
+        "item3": "Validar recursos disponíveis"
+      },
+      "notes": {
+        "title": "Observações",
+        "content": "Adicione observações adicionais, notas importantes ou exceções identificadas durante a verificação."
+      }
+    },
+    "guide": {
+      "title": "Guia de Referência Rápida",
+      "intro": "Este guia fornece informações rápidas e práticas sobre processos e procedimentos para facilitar a execução de tarefas.",
+      "overview": {
+        "title": "Visão Geral",
+        "content": "Este guia apresenta um resumo dos principais conceitos e processos relacionados ao tema, servindo como referência rápida para consulta."
+      },
+      "steps": {
+        "title": "Passos Principais",
+        "step1": "Preparar ambiente e recursos necessários",
+        "step2": "Executar processo principal conforme especificado",
+        "step3": "Verificar resultados e validar conformidade",
+        "step4": "Documentar conclusões e próximas ações"
+      },
+      "tips": {
+        "title": "Dicas Importantes",
+        "tip1": "Mantenha sempre a documentação atualizada",
+        "tip2": "Consulte as referências antes de iniciar",
+        "tip3": "Siga a ordem dos passos para melhores resultados",
+        "tip4": "Em caso de dúvida, consulte o responsável"
+      },
+      "troubleshooting": {
+        "title": "Solução de Problemas",
+        "content": "Em caso de problemas ou dificuldades, verifique os pontos abaixo:",
+        "item1": "Verificar se todos os pré-requisitos foram atendidos",
+        "item2": "Consultar a seção de perguntas frequentes (FAQ)"
+      }
+    },
+    "confidentiality": {
+      "title": "Termo de Confidencialidade",
+      "intro": "Este termo estabelece as condições de confidencialidade entre as partes envolvidas, garantindo a proteção de informações sensíveis.",
+      "parties": {
+        "title": "Partes Envolvidas",
+        "disclosing": "Parte Divulgadora",
+        "receiving": "Parte Receptora",
+        "companyName": "Nome da Empresa",
+        "clientName": "Nome do Cliente"
+      },
+      "section1": {
+        "title": "1. Definições",
+        "content": "Para os fins deste acordo, \"Informações Confidenciais\" significa todas as informações, dados, documentos e materiais fornecidos pela Parte Divulgadora à Parte Receptora.",
+        "detail": "Isso inclui, mas não se limita a: informações comerciais, técnicas, financeiras, estratégicas, listas de clientes, processos, métodos e qualquer outra informação considerada confidencial."
+      },
+      "section2": {
+        "title": "2. Obrigações",
+        "content": "A Parte Receptora concorda em:",
+        "item1": "Manter todas as informações confidenciais em segredo absoluto",
+        "item2": "Não divulgar informações a terceiros sem autorização prévia e por escrito",
+        "item3": "Usar informações apenas para os fins especificados neste acordo",
+        "item4": "Tomar todas as medidas razoáveis para proteger as informações confidenciais"
+      },
+      "section3": {
+        "title": "3. Prazo de Vigência",
+        "content": "Este acordo permanece em vigor por um período de [período] a partir da data de assinatura.",
+        "detail": "As obrigações de confidencialidade continuarão válidas mesmo após o término do acordo, conforme especificado."
+      },
+      "section4": {
+        "title": "4. Exceções",
+        "content": "As obrigações de confidencialidade não se aplicam a informações que: (a) já eram de conhecimento público; (b) foram desenvolvidas independentemente; (c) foram recebidas de terceiros sem restrições; ou (d) são exigidas por lei."
+      },
+      "section5": {
+        "title": "5. Assinaturas",
+        "nameSignature": "Nome e Assinatura",
+        "date": "Data"
+      }
+    },
+    "proposal": {
+      "title": "Proposta Comercial",
+      "intro": "Esta proposta foi desenvolvida especialmente para atender às suas necessidades e objetivos, apresentando uma solução completa e personalizada.",
+      "executive": {
+        "title": "Resumo Executivo",
+        "content": "Esta proposta apresenta uma solução completa e personalizada para atender às necessidades específicas do cliente.",
+        "detail": "Nosso objetivo é fornecer resultados excepcionais que superem as expectativas e agreguem valor significativo ao seu negócio."
+      },
+      "section1": {
+        "title": "1. Entendimento do Problema",
+        "content": "Com base em nossa análise detalhada, identificamos os seguintes desafios:",
+        "item1": "Desafio relacionado à eficiência operacional",
+        "item2": "Desafio relacionado à escalabilidade",
+        "item3": "Desafio relacionado à qualidade",
+        "item4": "Desafio relacionado aos custos"
+      },
+      "section2": {
+        "title": "2. Solução Proposta",
+        "content": "Nossa solução inclui os seguintes benefícios:",
+        "item1": "Aumento da eficiência e produtividade",
+        "item2": "Melhoria na qualidade dos resultados",
+        "item3": "Redução de custos operacionais",
+        "item4": "Escalabilidade para crescimento futuro",
+        "detail": "Nossa abordagem é baseada em melhores práticas do mercado e experiência comprovada em projetos similares."
+      },
+      "section3": {
+        "title": "3. Investimento",
+        "total": "Valor Total",
+        "amount": "R$ [valor]",
+        "payment": "Forma de Pagamento",
+        "details": "detalhes",
+        "note": "Todos os valores incluem impostos e podem ser parcelados conforme acordo comercial."
+      },
+      "section4": {
+        "title": "4. Cronograma",
+        "intro": "O projeto será executado em fases bem definidas:",
+        "phase1": "Fase 1: Planejamento e Preparação ([período])",
+        "phase2": "Fase 2: Execução e Implementação ([período])",
+        "phase3": "Fase 3: Entrega e Suporte ([período])"
+      },
+      "section5": {
+        "title": "5. Próximos Passos",
+        "content": "Para iniciarmos este projeto, precisamos:",
+        "item1": "Aprovação formal desta proposta",
+        "item2": "Assinatura do contrato",
+        "item3": "Agendamento da reunião de kickoff",
+        "closing": "Estamos à disposição para esclarecer qualquer dúvida e iniciar este projeto o quanto antes."
+      }
+    },
+    "contract": {
+      "title": "Contrato de Prestação de Serviços",
+      "parties": {
+        "title": "Partes Contratantes",
+        "contractor": "CONTRATANTE",
+        "contracted": "CONTRATADO",
+        "companyName": "Nome da Empresa",
+        "clientName": "Nome do Cliente",
+        "cnpj": "inscrita no CNPJ sob o nº",
+        "cnpjNumber": "CNPJ",
+        "document": "inscrito no CNPJ/CPF sob o nº",
+        "documentNumber": "documento"
+      },
+      "section1": {
+        "title": "1. Objeto do Contrato",
+        "content": "O presente contrato tem por objeto a prestação de serviços de [descrição dos serviços], conforme especificado neste documento."
+      },
+      "section2": {
+        "title": "2. Prazo de Execução",
+        "content": "Os serviços serão executados no prazo de [período], a contar da data de assinatura deste contrato."
+      },
+      "section3": {
+        "title": "3. Valor e Forma de Pagamento",
+        "total": "Valor Total",
+        "amount": "R$ [valor]",
+        "payment": "Forma de Pagamento",
+        "details": "detalhes"
+      },
+      "section4": {
+        "title": "4. Obrigações do Contratante",
+        "item1": "Fornecer todas as informações e documentos necessários para a execução dos serviços",
+        "item2": "Efetuar os pagamentos conforme acordado e nos prazos estabelecidos"
+      },
+      "section5": {
+        "title": "5. Obrigações do Contratado",
+        "item1": "Executar os serviços com qualidade e conforme as especificações acordadas",
+        "item2": "Cumprir os prazos estabelecidos e comunicar eventuais atrasos com antecedência"
+      },
+      "section6": {
+        "title": "6. Rescisão",
+        "content": "Este contrato poderá ser rescindido por qualquer das partes mediante aviso prévio de [período], sem prejuízo das obrigações já assumidas."
+      },
+      "section7": {
+        "title": "7. Foro",
+        "content": "Fica eleito o foro da comarca de [cidade] para dirimir questões oriundas deste contrato."
+      },
+      "section8": {
+        "title": "Assinaturas",
+        "contractor": "Nome e Assinatura - Contratante",
+        "contracted": "Nome e Assinatura - Contratado",
+        "date": "Data"
+      }
+    },
+    "policy": {
+      "title": "Política",
+      "section1": {
+        "title": "1. Objetivo",
+        "content": "Esta política estabelece diretrizes e normas para [objetivo da política], garantindo consistência e conformidade em toda a organização."
+      },
+      "section2": {
+        "title": "2. Escopo",
+        "content": "Esta política aplica-se a [quem se aplica], incluindo funcionários, parceiros e terceiros envolvidos."
+      },
+      "section3": {
+        "title": "3. Diretrizes",
+        "item1": "Diretriz 1",
+        "item2": "Diretriz 2",
+        "item3": "Diretriz 3"
+      },
+      "section4": {
+        "title": "4. Responsabilidades",
+        "responsible": "Responsável",
+        "position": "cargo/função",
+        "responsibilities": "Responsabilidades",
+        "item1": "Responsabilidade 1",
+        "item2": "Responsabilidade 2"
+      },
+      "section5": {
+        "title": "5. Revisão",
+        "content": "Esta política será revisada anualmente ou conforme necessário, garantindo sua atualização e relevância."
+      },
+      "section6": {
+        "title": "6. Aprovação",
+        "approved": "Aprovado em",
+        "signature": "Assinatura"
+      }
+    },
+    "procedure": {
+      "title": "Procedimento Operacional",
+      "section1": {
+        "title": "1. Objetivo",
+        "content": "Este procedimento descreve o processo passo a passo para [objetivo do procedimento], garantindo padronização e qualidade."
+      },
+      "section2": {
+        "title": "2. Escopo",
+        "content": "Aplica-se a [área/processo específico] e deve ser seguido por todos os envolvidos."
+      },
+      "section3": {
+        "title": "3. Processo",
+        "subsection1": {
+          "title": "3.1. Passo Inicial",
+          "item1": "Primeira ação a ser realizada",
+          "item2": "Segunda ação a ser realizada",
+          "item3": "Terceira ação a ser realizada"
+        },
+        "subsection2": {
+          "title": "3.2. Passos Intermediários",
+          "item1": "Ação intermediária 1",
+          "item2": "Ação intermediária 2"
+        },
+        "subsection3": {
+          "title": "3.3. Passo Final",
+          "item1": "Ação final 1",
+          "item2": "Ação final 2"
+        }
+      },
+      "section4": {
+        "title": "4. Responsáveis",
+        "execution": "Responsável pela execução",
+        "approval": "Responsável pela aprovação",
+        "namePosition": "nome/cargo"
+      },
+      "section5": {
+        "title": "5. Documentos Relacionados",
+        "item1": "Documento 1",
+        "item2": "Documento 2"
+      }
+    }
   }
 }
 

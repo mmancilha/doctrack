@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth-helpers";
 import { storage } from "@/lib/storage";
 import { insertDocumentSchema } from "@shared/schema";
+import { getFullName } from "@/lib/user-helpers";
 import { z } from "zod";
 import { resolveParams } from "@/lib/route-helpers";
 
@@ -70,7 +71,7 @@ export async function PATCH(
     const validatedData = partialSchema.parse({
       ...body,
       authorId: user.id,
-      authorName: user.username,
+      authorName: getFullName(user),
     });
 
     const document = await storage.updateDocument(id, validatedData);
@@ -79,7 +80,7 @@ export async function PATCH(
       await storage.createAuditLog({
         documentId: document.id,
         userId: user.id,
-        userName: user.username,
+        userName: getFullName(user),
         action: "updated",
         details: `Updated document: ${document.title}`,
       });
@@ -133,7 +134,7 @@ export async function DELETE(
     await storage.createAuditLog({
       documentId: document.id,
       userId: user.id,
-      userName: user.username,
+      userName: getFullName(user),
       action: "deleted",
       details: `Deleted document: ${document.title}`,
     });

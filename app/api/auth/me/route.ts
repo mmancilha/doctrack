@@ -28,8 +28,10 @@ export async function GET(request: NextRequest) {
     id: fullUser.id,
     username: fullUser.username,
     role: fullUser.role,
-    displayName: fullUser.displayName,
-    avatarUrl: fullUser.avatarUrl,
+    firstName: fullUser.firstName ?? null,
+    lastName: fullUser.lastName ?? null,
+    displayName: fullUser.displayName ?? null, // Mantido para compatibilidade
+    avatarUrl: fullUser.avatarUrl ?? null,
   });
 }
 

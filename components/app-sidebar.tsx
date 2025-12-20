@@ -10,9 +10,6 @@ import {
   Plus,
   Clock,
   FolderOpen,
-  BookOpen,
-  CheckSquare,
-  FileCheck,
   UserCog,
   ScrollText,
   ChevronRight,
@@ -79,12 +76,6 @@ export function AppSidebar() {
   const mainNavItems = [
     { title: t("navigation.dashboard"), url: "/", icon: Home },
     { title: t("navigation.recent"), url: "/recent", icon: Clock },
-  ];
-
-  const categoryItems = [
-    { title: t("categories.manuals"), url: "/category/manual", icon: BookOpen, count: 0 },
-    { title: t("categories.checklists"), url: "/category/checklist", icon: CheckSquare, count: 0 },
-    { title: t("categories.guides"), url: "/category/guide", icon: FileCheck, count: 0 },
   ];
 
   // Generate document ID with sequential number per client
@@ -174,7 +165,8 @@ export function AppSidebar() {
                         <CollapsibleContent>
                           <SidebarMenuSub>
                             {clientDocs.map((doc, index) => {
-                              const categoryLabel = categoryLabels[doc.category as keyof typeof categoryLabels]?.singular || doc.category;
+                              const categoryLabel = categoryLabels[doc.category as keyof typeof categoryLabels]?.singular || 
+                                (doc.category.charAt(0).toUpperCase() + doc.category.slice(1).toLowerCase());
                               return (
                                 <SidebarMenuSubItem key={doc.id}>
                                   <SidebarMenuSubButton
@@ -208,27 +200,18 @@ export function AppSidebar() {
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {categoryItems.map((item) => (
-                <SidebarMenuItem key={item.url}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={pathname === item.url}
-                    data-testid={`nav-category-${item.title.toLowerCase()}`}
-                  >
-                    <Link href={item.url} className="flex items-center justify-between w-full">
-                      <div className="flex items-center gap-2">
-                        <item.icon className="h-4 w-4" />
-                        <span>{item.title}</span>
-                      </div>
-                      {item.count > 0 && (
-                        <Badge variant="secondary" className="text-xs">
-                          {item.count}
-                        </Badge>
-                      )}
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  asChild
+                  isActive={pathname === "/category"}
+                  data-testid="nav-category-all"
+                >
+                  <Link href="/category" className="flex items-center gap-2">
+                    <FolderOpen className="h-4 w-4" />
+                    <span>{t("buttons.viewAll")}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
