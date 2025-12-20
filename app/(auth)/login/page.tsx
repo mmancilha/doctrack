@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
@@ -31,8 +31,14 @@ export default function LoginPage() {
   }>({});
   const [isPending, setIsPending] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const usernameRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
+
+  // Prevenir erro de hidratação garantindo que o conteúdo traduzido só seja renderizado no cliente
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Translates technical error messages to user-friendly messages
   const getErrorMessage = (errorMsg: string): string => {
@@ -131,7 +137,7 @@ export default function LoginPage() {
               />
             </motion.div>
             <p className="text-muted-foreground text-sm font-medium">
-              {tCommon("appDescription")}
+              {mounted ? tCommon("appDescription") : "Document Management System"}
             </p>
           </div>
 

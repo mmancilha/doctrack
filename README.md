@@ -95,19 +95,19 @@ DocTrack is a comprehensive document management solution designed for businesses
 
 Clean and modern login interface.
 
-![Login](docs/screenshots/doctrack-login.png)
+![Login](docs/screenshots/login.png)
 
 ### Dashboard
 
 Modern dashboard with document statistics and recent activity.
 
-![Dashboard](docs/screenshots/doctrack-dashboard.png)
+![Dashboard](docs/screenshots/dashboard.png)
 
 ### Document Editor
 
 Full-featured rich text editor with client selection and category management.
 
-![Document Editor](docs/screenshots/doctrack-editor.png)
+![Document Editor](docs/screenshots/editoDocument.png)
 
 ## 📁 Project Structure
 
