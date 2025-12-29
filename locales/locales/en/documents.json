@@ -1,0 +1,523 @@
+{
+  "editor": {
+    "titlePlaceholder": "Document title...",
+    "contentPlaceholder": "Start writing your document...",
+    "category": "Category",
+    "selectCategory": "Select Category",
+    "status": "Status",
+    "selectStatus": "Select Status",
+    "searchStatus": "Search status...",
+    "noStatusFound": "No status found",
+    "client": "Client",
+    "clientPlaceholder": "Select or type client name...",
+    "selectClient": "Select client",
+    "searchClient": "Search client...",
+    "searchOrCreateClient": "Search or type to create client...",
+    "noClientFound": "No client found.",
+    "createClient": "Create client \"{{name}}\"",
+    "existingClients": "Existing clients",
+    "typeToCreate": "Type the client name to create a new one",
+    "clientHint": "Type to search or create a new client",
+    "searchCategory": "Search category...",
+    "searchOrCreateCategory": "Search or type to create category...",
+    "noCategoryFound": "No category found",
+    "createCategory": "Create category \"{{name}}\"",
+    "typeToCreateCategory": "Type the category name to create a new one",
+          "save": "Save",
+          "saving": "Saving...",
+          "exporting": "Exporting...",
+          "create": "Create",
+    "delete": "Delete",
+    "history": "History",
+    "versions": "Versions",
+    "versionHistory": "Version History",
+    "compare": "Compare",
+    "comments": "Comments",
+    "export": "Export",
+    "exportPdf": "Export PDF",
+    "exportCurrentVersion": "Export Current Version",
+    "exportVersion": "Export v{{version}}",
+    "exportAsPdf": "Export as PDF",
+    "deleteDocument": "Delete Document",
+    "moreOptions": "More options",
+    "general": "General"
+  },
+  "deleteConfirm": {
+    "title": "Delete document?",
+    "description": "This action is irreversible. The document will be permanently removed from the system.",
+    "cancel": "Cancel",
+    "confirm": "Delete"
+  },
+  "table": {
+    "allDocuments": "All Documents",
+    "description": "Manage and view all your documents in a table",
+    "search": "Search documents...",
+    "title": "Title",
+    "noTitle": "No title",
+    "author": "Author",
+    "updated": "Updated",
+    "openMenu": "Open menu",
+    "actions": "Actions",
+    "view": "View",
+    "noResults": "No results found.",
+    "noDocuments": "No documents found",
+    "noDocumentsDescription": "Start by creating a new document",
+    "showing": "Showing",
+    "to": "to",
+    "of": "of",
+    "results": "results",
+    "page": "Page",
+    "previous": "Previous",
+    "next": "Next",
+    "rowsPerPage": "Rows per page"
+  },
+  "toast": {
+    "created": {
+      "title": "Document created",
+      "description": "Your document has been saved."
+    },
+    "saved": {
+      "title": "Document saved",
+      "description": "Your changes have been saved."
+    },
+    "deleted": {
+      "title": "Document deleted",
+      "description": "The document has been removed."
+    },
+    "exported": {
+      "title": "PDF exported",
+      "description": "Your document has been downloaded."
+    },
+    "versionLoaded": {
+      "title": "Version loaded",
+      "description": "Loaded version {{version}}. Save to keep changes."
+    },
+    "error": {
+      "title": "Error",
+      "create": "Failed to create document.",
+      "save": "Failed to save document.",
+      "export": "Failed to export PDF.",
+      "noTitle": "Please enter a document title.",
+      "noClient": "Please enter a client name.",
+      "noPermission": "You do not have permission to edit documents."
+    }
+  },
+  "versions": {
+    "title": "Version History",
+    "count": "{{count}} version",
+    "count_other": "{{count}} versions",
+    "latest": "Latest",
+    "selected": "Selected",
+    "noVersions": "No versions yet",
+    "noVersionsHint": "Versions are created when you save changes",
+    "selectToCompare": "Click a version to select for comparison",
+    "selectedVersion": "Selected v{{version}}. Click another version to compare."
+  },
+  "diff": {
+    "title": "Version Comparison",
+    "comparing": "Comparing v{{v1}} with v{{v2}}",
+    "from": "From",
+    "to": "To",
+    "additions": "characters added",
+    "additions_other": "characters added",
+    "deletions": "characters removed",
+    "deletions_other": "characters removed",
+    "noChanges": "No text changes between versions",
+    "noChangesHint": "The documents may have other differences not shown in plain text."
+  },
+  "comments": {
+    "title": "Comments",
+    "placeholder": "Add a comment...",
+    "send": "Send",
+    "cancel": "Cancel",
+    "addComment": "Add Comment",
+    "selectedText": "Selected text",
+    "loading": "Loading comments...",
+    "noComments": "No comments yet",
+    "noCommentsHint": "Be the first to add a comment to this document.",
+    "resolve": "Resolve",
+    "resolved": "Resolved",
+    "deleteConfirm": "Are you sure you want to delete this comment?",
+    "toast": {
+      "added": {
+        "title": "Comment added",
+        "description": "Your comment has been posted."
+      },
+      "deleted": {
+        "title": "Comment deleted",
+        "description": "The comment has been removed."
+      },
+      "error": {
+        "add": "Failed to add comment.",
+        "delete": "Failed to delete comment."
+      }
+    }
+  },
+  "list": {
+    "title": "All Documents",
+    "description": "Browse and manage all your documentation.",
+    "empty": {
+      "title": "No documents found",
+      "description": "Try adjusting your search or create a new document."
+    },
+    "search": "Search documents...",
+    "noContent": "No content yet"
+  },
+  "recent": {
+    "title": "Recent Documents",
+    "description": "Documents you've recently viewed or edited.",
+    "empty": {
+      "title": "No recent documents",
+      "description": "Documents you view or edit will appear here."
+    }
+  },
+  "category": {
+    "title": "{{category}}",
+    "description": "Browse all {{category}} in your library.",
+    "empty": {
+      "title": "No {{category}} found",
+      "description": "Create your first {{singular}} to get started."
+    }
+  },
+  "notFound": {
+    "title": "Page Not Found",
+    "description": "The page you're looking for doesn't exist or has been moved."
+  },
+  "richEditor": {
+    "loading": "Loading editor...",
+    "promptUrl": "Enter URL:",
+    "promptImageUrl": "Enter image URL:",
+    "undo": "Undo",
+    "redo": "Redo",
+    "heading1": "Heading 1",
+    "heading2": "Heading 2",
+    "heading3": "Heading 3",
+    "bold": "Bold",
+    "italic": "Italic",
+    "underline": "Underline",
+    "strikethrough": "Strikethrough",
+    "code": "Code",
+    "bulletList": "Bullet List",
+    "orderedList": "Ordered List",
+    "quote": "Quote",
+    "horizontalRule": "Horizontal Rule",
+    "addLink": "Add Link",
+    "addImage": "Add Image",
+    "insertTable": "Insert Table"
+  },
+  "filters": {
+    "allTime": "All time",
+    "last7Days": "Last 7 days",
+    "last30Days": "Last 30 days",
+    "last90Days": "Last 90 days",
+    "allCategories": "All Categories",
+    "allStatuses": "All Statuses",
+    "date": "Date",
+    "dateRange": "Date Range",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "activeFilters": "Active filters",
+    "search": "Search",
+    "clearAll": "Clear all",
+    "showing": "Showing",
+    "documents": "documents",
+    "document": "document",
+    "removeCategory": "Remove category",
+    "removeClient": "Remove client",
+    "clientInUse": "Client in use in documents",
+    "hideClient": "Hide client",
+    "categoryInUse": "Default category cannot be removed",
+    "errorDeletingClient": "Error removing client",
+    "clientNotFound": "Client not found or you do not have permission to delete it",
+    "clientInUseCannotDelete": "This client cannot be deleted because it is being used in one or more documents. Remove the client from the documents before deleting it.",
+    "clientDeleteFailed": "Failed to delete the client. Please try again later.",
+    "clientDeleteSuccess": "Client removed successfully"
+  },
+  "templates": {
+    "manual": {
+      "title": "Operations Manual",
+      "intro": "This manual describes the procedures and guidelines for organizational operations and processes.",
+      "section1": {
+        "title": "1. Introduction",
+        "content": "Add introductory information about the manual here."
+      },
+      "section2": {
+        "title": "2. Procedures",
+        "content": "Describe the main procedures:",
+        "item1": "Procedure 1",
+        "item2": "Procedure 2",
+        "item3": "Procedure 3"
+      },
+      "section3": {
+        "title": "3. Conclusion",
+        "content": "Add final information and important considerations here."
+      }
+    },
+    "checklist": {
+      "title": "Checklist",
+      "intro": "Use this checklist to ensure all items are verified and completed systematically.",
+      "section1": {
+        "title": "Main Items",
+        "item1": "Verify initial requirements",
+        "item2": "Confirm necessary documentation",
+        "item3": "Validate basic information",
+        "item4": "Review compliance with standards",
+        "item5": "Confirm necessary approvals"
+      },
+      "section2": {
+        "title": "Secondary Items",
+        "item1": "Verify additional details",
+        "item2": "Confirm communication with stakeholders",
+        "item3": "Validate available resources"
+      },
+      "notes": {
+        "title": "Notes",
+        "content": "Add additional observations, important notes, or exceptions identified during verification."
+      }
+    },
+    "guide": {
+      "title": "Quick Reference Guide",
+      "intro": "This guide provides quick and practical information about processes and procedures to facilitate task execution.",
+      "overview": {
+        "title": "Overview",
+        "content": "This guide presents a summary of the main concepts and processes related to the topic, serving as a quick reference for consultation."
+      },
+      "steps": {
+        "title": "Main Steps",
+        "step1": "Prepare environment and necessary resources",
+        "step2": "Execute main process as specified",
+        "step3": "Verify results and validate compliance",
+        "step4": "Document conclusions and next actions"
+      },
+      "tips": {
+        "title": "Important Tips",
+        "tip1": "Always keep documentation updated",
+        "tip2": "Consult references before starting",
+        "tip3": "Follow the order of steps for best results",
+        "tip4": "In case of doubt, consult the responsible party"
+      },
+      "troubleshooting": {
+        "title": "Troubleshooting",
+        "content": "In case of problems or difficulties, check the points below:",
+        "item1": "Verify if all prerequisites have been met",
+        "item2": "Consult the frequently asked questions (FAQ) section"
+      }
+    },
+    "confidentiality": {
+      "title": "Confidentiality Agreement",
+      "intro": "This agreement establishes confidentiality conditions between the involved parties, ensuring protection of sensitive information.",
+      "parties": {
+        "title": "Parties",
+        "disclosing": "Disclosing Party",
+        "receiving": "Receiving Party",
+        "companyName": "Company Name",
+        "clientName": "Client Name"
+      },
+      "section1": {
+        "title": "1. Definitions",
+        "content": "For purposes of this agreement, \"Confidential Information\" means all information, data, documents and materials provided by the Disclosing Party to the Receiving Party.",
+        "detail": "This includes, but is not limited to: commercial, technical, financial, strategic information, customer lists, processes, methods and any other information considered confidential."
+      },
+      "section2": {
+        "title": "2. Obligations",
+        "content": "The Receiving Party agrees to:",
+        "item1": "Keep all confidential information absolutely secret",
+        "item2": "Not disclose information to third parties without prior written authorization",
+        "item3": "Use information only for the purposes specified in this agreement",
+        "item4": "Take all reasonable measures to protect confidential information"
+      },
+      "section3": {
+        "title": "3. Term",
+        "content": "This agreement remains in effect for a period of [period] from the date of signature.",
+        "detail": "Confidentiality obligations will remain valid even after the agreement ends, as specified."
+      },
+      "section4": {
+        "title": "4. Exceptions",
+        "content": "Confidentiality obligations do not apply to information that: (a) was already publicly known; (b) was independently developed; (c) was received from third parties without restrictions; or (d) is required by law."
+      },
+      "section5": {
+        "title": "5. Signatures",
+        "nameSignature": "Name and Signature",
+        "date": "Date"
+      }
+    },
+    "proposal": {
+      "title": "Commercial Proposal",
+      "intro": "This proposal has been specially developed to meet your needs and objectives, presenting a complete and personalized solution.",
+      "executive": {
+        "title": "Executive Summary",
+        "content": "This proposal presents a complete and personalized solution to meet the client's specific needs.",
+        "detail": "Our goal is to deliver exceptional results that exceed expectations and add significant value to your business."
+      },
+      "section1": {
+        "title": "1. Problem Understanding",
+        "content": "Based on our detailed analysis, we have identified the following challenges:",
+        "item1": "Challenge related to operational efficiency",
+        "item2": "Challenge related to scalability",
+        "item3": "Challenge related to quality",
+        "item4": "Challenge related to costs"
+      },
+      "section2": {
+        "title": "2. Proposed Solution",
+        "content": "Our solution includes the following benefits:",
+        "item1": "Increased efficiency and productivity",
+        "item2": "Improved quality of results",
+        "item3": "Reduced operational costs",
+        "item4": "Scalability for future growth",
+        "detail": "Our approach is based on market best practices and proven experience in similar projects."
+      },
+      "section3": {
+        "title": "3. Investment",
+        "total": "Total Value",
+        "amount": "$ [amount]",
+        "payment": "Payment Method",
+        "details": "details",
+        "note": "All amounts include taxes and can be paid in installments as per commercial agreement."
+      },
+      "section4": {
+        "title": "4. Timeline",
+        "intro": "The project will be executed in well-defined phases:",
+        "phase1": "Phase 1: Planning and Preparation ([period])",
+        "phase2": "Phase 2: Execution and Implementation ([period])",
+        "phase3": "Phase 3: Delivery and Support ([period])"
+      },
+      "section5": {
+        "title": "5. Next Steps",
+        "content": "To start this project, we need:",
+        "item1": "Formal approval of this proposal",
+        "item2": "Contract signature",
+        "item3": "Kickoff meeting scheduling",
+        "closing": "We are available to clarify any questions and start this project as soon as possible."
+      }
+    },
+    "contract": {
+      "title": "Service Agreement",
+      "parties": {
+        "title": "Contracting Parties",
+        "contractor": "CONTRACTOR",
+        "contracted": "CONTRACTED",
+        "companyName": "Company Name",
+        "clientName": "Client Name",
+        "cnpj": "registered under CNPJ no.",
+        "cnpjNumber": "CNPJ",
+        "document": "registered under CNPJ/CPF no.",
+        "documentNumber": "document"
+      },
+      "section1": {
+        "title": "1. Object of the Agreement",
+        "content": "This agreement has as its object the provision of services of [service description], as specified in this document."
+      },
+      "section2": {
+        "title": "2. Execution Term",
+        "content": "Services will be executed within a period of [period], counting from the date of signature of this agreement."
+      },
+      "section3": {
+        "title": "3. Value and Payment Method",
+        "total": "Total Value",
+        "amount": "$ [amount]",
+        "payment": "Payment Method",
+        "details": "details"
+      },
+      "section4": {
+        "title": "4. Contractor's Obligations",
+        "item1": "Provide all information and documents necessary for service execution",
+        "item2": "Make payments as agreed and within established deadlines"
+      },
+      "section5": {
+        "title": "5. Contracted's Obligations",
+        "item1": "Execute services with quality and according to agreed specifications",
+        "item2": "Meet established deadlines and communicate any delays in advance"
+      },
+      "section6": {
+        "title": "6. Termination",
+        "content": "This agreement may be terminated by either party with [period] prior notice, without prejudice to obligations already assumed."
+      },
+      "section7": {
+        "title": "7. Jurisdiction",
+        "content": "The jurisdiction of [city] is elected to resolve issues arising from this agreement."
+      },
+      "section8": {
+        "title": "Signatures",
+        "contractor": "Name and Signature - Contractor",
+        "contracted": "Name and Signature - Contracted",
+        "date": "Date"
+      }
+    },
+    "policy": {
+      "title": "Policy",
+      "section1": {
+        "title": "1. Objective",
+        "content": "This policy establishes guidelines and standards for [policy objective], ensuring consistency and compliance throughout the organization."
+      },
+      "section2": {
+        "title": "2. Scope",
+        "content": "This policy applies to [who it applies to], including employees, partners and involved third parties."
+      },
+      "section3": {
+        "title": "3. Guidelines",
+        "item1": "Guideline 1",
+        "item2": "Guideline 2",
+        "item3": "Guideline 3"
+      },
+      "section4": {
+        "title": "4. Responsibilities",
+        "responsible": "Responsible",
+        "position": "position/role",
+        "responsibilities": "Responsibilities",
+        "item1": "Responsibility 1",
+        "item2": "Responsibility 2"
+      },
+      "section5": {
+        "title": "5. Review",
+        "content": "This policy will be reviewed annually or as needed, ensuring its update and relevance."
+      },
+      "section6": {
+        "title": "6. Approval",
+        "approved": "Approved on",
+        "signature": "Signature"
+      }
+    },
+    "procedure": {
+      "title": "Operational Procedure",
+      "section1": {
+        "title": "1. Objective",
+        "content": "This procedure describes the step-by-step process for [procedure objective], ensuring standardization and quality."
+      },
+      "section2": {
+        "title": "2. Scope",
+        "content": "Applies to [specific area/process] and must be followed by all involved."
+      },
+      "section3": {
+        "title": "3. Process",
+        "subsection1": {
+          "title": "3.1. Initial Step",
+          "item1": "First action to be performed",
+          "item2": "Second action to be performed",
+          "item3": "Third action to be performed"
+        },
+        "subsection2": {
+          "title": "3.2. Intermediate Steps",
+          "item1": "Intermediate action 1",
+          "item2": "Intermediate action 2"
+        },
+        "subsection3": {
+          "title": "3.3. Final Step",
+          "item1": "Final action 1",
+          "item2": "Final action 2"
+        }
+      },
+      "section4": {
+        "title": "4. Responsible Parties",
+        "execution": "Responsible for execution",
+        "approval": "Responsible for approval",
+        "namePosition": "name/position"
+      },
+      "section5": {
+        "title": "5. Related Documents",
+        "item1": "Document 1",
+        "item2": "Document 2"
+      }
+    }
+  }
+}
+

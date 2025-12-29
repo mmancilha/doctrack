@@ -1,0 +1,92 @@
+{
+  "title": "Admin",
+  "users": {
+    "title": "User Management",
+    "description": "Manage user accounts and permissions",
+    "addUser": "Add User",
+    "allUsers": "All Users",
+    "usersCount": "{{count}} user",
+    "usersCount_other": "{{count}} users",
+    "usersWithAccess": "Users with access to DocTrack",
+    "you": "You",
+    "loadingUsers": "Loading users...",
+    "create": {
+      "title": "Create New User",
+      "description": "Add a new user to the system. They will be able to log in with these credentials.",
+      "username": "Username",
+      "usernamePlaceholder": "Enter username",
+      "password": "Password",
+      "passwordPlaceholder": "Enter password",
+      "role": "Role",
+      "roleReader": "Reader - Can view documents",
+      "roleEditor": "Editor - Can edit documents",
+      "roleAdmin": "Admin - Full access",
+      "submit": "Create User",
+      "creating": "Creating..."
+    },
+    "edit": {
+      "title": "Edit User: {{username}}",
+      "description": "Update role or reset password for this user.",
+      "role": "Role",
+      "newPassword": "New Password (optional)",
+      "newPasswordPlaceholder": "Leave blank to keep current password",
+      "submit": "Save Changes",
+      "saving": "Saving..."
+    },
+    "delete": {
+      "title": "Delete User",
+      "description": "Are you sure you want to delete \"{{username}}\"? This action cannot be undone."
+    },
+    "toast": {
+      "created": {
+        "title": "User created",
+        "description": "New user has been created successfully."
+      },
+      "updated": {
+        "title": "User updated",
+        "description": "User has been updated successfully."
+      },
+      "deleted": {
+        "title": "User deleted",
+        "description": "User has been deleted successfully."
+      },
+      "error": {
+        "create": "Failed to create user.",
+        "update": "Failed to update user.",
+        "delete": "Failed to delete user.",
+        "required": "Username and password are required.",
+        "noChanges": "Please provide a role or password to update."
+      }
+    },
+    "accessDenied": {
+      "title": "Access Denied",
+      "description": "Only administrators can access user management."
+    }
+  },
+  "auditLogs": {
+    "title": "Audit Logs",
+    "description": "Track all document modifications and user actions",
+    "activityHistory": "Activity History",
+    "noActivity": "No activity recorded yet",
+    "byUser": "by {{user}} on {{date}}",
+    "actions": {
+      "created": "created",
+      "updated": "updated",
+      "deleted": "deleted",
+      "viewed": "viewed",
+      "commented": "commented"
+    },
+    "details": {
+      "createdDocument": "Created document: {{title}}",
+      "updatedDocument": "Updated document: {{title}}",
+      "deletedDocument": "Deleted document: {{title}}",
+      "addedComment": "Added comment on document: {{title}}"
+    },
+    "accessDenied": {
+      "title": "Access Denied",
+      "description": "You do not have permission to view audit logs.",
+      "hint": "This feature is only available to administrators."
+    }
+  }
+}
+

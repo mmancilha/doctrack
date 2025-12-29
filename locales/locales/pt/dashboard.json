@@ -1,0 +1,23 @@
+{
+  "title": "Painel",
+  "welcome": "Bem-vindo de volta! Aqui está uma visão geral da sua documentação.",
+  "newDocument": "Novo Documento",
+  "stats": {
+    "totalDocuments": "Total de Documentos",
+    "totalDescription": "Todos os documentos na sua biblioteca",
+    "published": "Publicados",
+    "publishedDescription": "Documentos prontos para uso",
+    "drafts": "Rascunhos",
+    "draftsDescription": "Trabalhos em andamento",
+    "categories": "Categorias",
+    "categoriesDescription": "{{manuals}} manuais, {{checklists}} checklists, {{guides}} guias"
+  },
+  "recentDocuments": "Documentos Recentes",
+  "empty": {
+    "title": "Nenhum documento ainda",
+    "descriptionEditor": "Crie seu primeiro documento para começar a usar o DocTrack.",
+    "descriptionReader": "Nenhum documento disponível ainda.",
+    "action": "Criar Documento"
+  }
+}
+

@@ -1,0 +1,523 @@
+{
+  "richEditor": {
+    "loading": "Chargement de l'éditeur...",
+    "promptUrl": "Entrez l'URL :",
+    "promptImageUrl": "Entrez l'URL de l'image :",
+    "undo": "Annuler",
+    "redo": "Rétablir",
+    "heading1": "Titre 1",
+    "heading2": "Titre 2",
+    "heading3": "Titre 3",
+    "bold": "Gras",
+    "italic": "Italique",
+    "underline": "Souligné",
+    "strikethrough": "Barré",
+    "code": "Code",
+    "bulletList": "Liste à Puces",
+    "orderedList": "Liste Numérotée",
+    "quote": "Citation",
+    "horizontalRule": "Ligne Horizontale",
+    "addLink": "Ajouter un Lien",
+    "addImage": "Ajouter une Image",
+    "insertTable": "Insérer un Tableau"
+  },
+  "editor": {
+    "titlePlaceholder": "Titre du document...",
+    "contentPlaceholder": "Commencez à rédiger votre document...",
+    "category": "Catégorie",
+    "selectCategory": "Sélectionner une Catégorie",
+    "status": "Statut",
+    "selectStatus": "Sélectionner un Statut",
+    "searchStatus": "Rechercher un statut...",
+    "noStatusFound": "Aucun statut trouvé",
+    "client": "Client",
+    "clientPlaceholder": "Sélectionnez ou tapez le nom du client...",
+    "selectClient": "Sélectionner un client",
+    "searchClient": "Rechercher un client...",
+    "searchOrCreateClient": "Rechercher ou taper pour créer un client...",
+    "noClientFound": "Aucun client trouvé.",
+    "createClient": "Créer le client \"{{name}}\"",
+    "existingClients": "Clients existants",
+    "typeToCreate": "Tapez le nom du client pour en créer un nouveau",
+    "clientHint": "Tapez pour rechercher ou créer un nouveau client",
+    "searchCategory": "Rechercher une catégorie...",
+    "searchOrCreateCategory": "Rechercher ou taper pour créer une catégorie...",
+    "noCategoryFound": "Aucune catégorie trouvée",
+    "createCategory": "Créer la catégorie \"{{name}}\"",
+    "typeToCreateCategory": "Tapez le nom de la catégorie pour en créer une nouvelle",
+          "save": "Enregistrer",
+          "saving": "Enregistrement...",
+          "exporting": "Exportation...",
+          "create": "Créer",
+    "delete": "Supprimer",
+    "history": "Historique",
+    "versions": "Versions",
+    "versionHistory": "Historique des Versions",
+    "compare": "Comparer",
+    "comments": "Commentaires",
+    "export": "Exporter",
+    "exportPdf": "Exporter PDF",
+    "exportCurrentVersion": "Exporter la Version Actuelle",
+    "exportVersion": "Exporter v{{version}}",
+    "exportAsPdf": "Exporter en PDF",
+    "deleteDocument": "Supprimer le Document",
+    "moreOptions": "Plus d'options",
+    "general": "Général"
+  },
+  "deleteConfirm": {
+    "title": "Supprimer le document ?",
+    "description": "Cette action est irréversible. Le document sera définitivement supprimé du système.",
+    "cancel": "Annuler",
+    "confirm": "Supprimer"
+  },
+  "table": {
+    "allDocuments": "Tous les Documents",
+    "description": "Gérez et visualisez tous vos documents dans un tableau",
+    "search": "Rechercher des documents...",
+    "title": "Titre",
+    "noTitle": "Sans titre",
+    "author": "Auteur",
+    "updated": "Mis à jour",
+    "openMenu": "Ouvrir le menu",
+    "actions": "Actions",
+    "view": "Voir",
+    "noResults": "Aucun résultat trouvé.",
+    "noDocuments": "Aucun document trouvé",
+    "noDocumentsDescription": "Commencez par créer un nouveau document",
+    "showing": "Affichage",
+    "to": "à",
+    "of": "de",
+    "results": "résultats",
+    "page": "Page",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "rowsPerPage": "Lignes par page"
+  },
+  "toast": {
+    "created": {
+      "title": "Document créé",
+      "description": "Votre document a été enregistré."
+    },
+    "saved": {
+      "title": "Document enregistré",
+      "description": "Vos modifications ont été enregistrées."
+    },
+    "deleted": {
+      "title": "Document supprimé",
+      "description": "Le document a été supprimé."
+    },
+    "exported": {
+      "title": "PDF exporté",
+      "description": "Votre document a été téléchargé."
+    },
+    "versionLoaded": {
+      "title": "Version chargée",
+      "description": "Version {{version}} chargée. Enregistrez pour conserver les modifications."
+    },
+    "error": {
+      "title": "Erreur",
+      "create": "Échec de la création du document.",
+      "save": "Échec de l'enregistrement du document.",
+      "export": "Échec de l'exportation du PDF.",
+      "noTitle": "Veuillez entrer un titre pour le document.",
+      "noClient": "Veuillez entrer un nom de client.",
+      "noPermission": "Vous n'avez pas la permission de modifier les documents."
+    }
+  },
+  "versions": {
+    "title": "Historique des Versions",
+    "count": "{{count}} version",
+    "count_other": "{{count}} versions",
+    "latest": "Plus récente",
+    "selected": "Sélectionnée",
+    "noVersions": "Aucune version pour le moment",
+    "noVersionsHint": "Les versions sont créées lorsque vous enregistrez des modifications",
+    "selectToCompare": "Cliquez sur une version pour la sélectionner pour comparaison",
+    "selectedVersion": "Version v{{version}} sélectionnée. Cliquez sur une autre version pour comparer."
+  },
+  "diff": {
+    "title": "Comparaison des Versions",
+    "comparing": "Comparaison de v{{v1}} avec v{{v2}}",
+    "from": "De",
+    "to": "Vers",
+    "additions": "caractères ajoutés",
+    "additions_other": "caractères ajoutés",
+    "deletions": "caractères supprimés",
+    "deletions_other": "caractères supprimés",
+    "noChanges": "Aucune modification de texte entre les versions",
+    "noChangesHint": "Les documents peuvent avoir d'autres différences non affichées en texte brut."
+  },
+  "comments": {
+    "title": "Commentaires",
+    "placeholder": "Ajouter un commentaire...",
+    "send": "Envoyer",
+    "cancel": "Annuler",
+    "addComment": "Ajouter un Commentaire",
+    "selectedText": "Texte sélectionné",
+    "loading": "Chargement des commentaires...",
+    "noComments": "Aucun commentaire pour le moment",
+    "noCommentsHint": "Soyez le premier à commenter ce document.",
+    "resolve": "Résoudre",
+    "resolved": "Résolu",
+    "deleteConfirm": "Êtes-vous sûr de vouloir supprimer ce commentaire ?",
+    "toast": {
+      "added": {
+        "title": "Commentaire ajouté",
+        "description": "Votre commentaire a été publié."
+      },
+      "deleted": {
+        "title": "Commentaire supprimé",
+        "description": "Le commentaire a été supprimé."
+      },
+      "error": {
+        "add": "Échec de l'ajout du commentaire.",
+        "delete": "Échec de la suppression du commentaire."
+      }
+    }
+  },
+  "list": {
+    "title": "Tous les Documents",
+    "description": "Parcourez et gérez toute votre documentation.",
+    "empty": {
+      "title": "Aucun document trouvé",
+      "description": "Essayez d'ajuster votre recherche ou créez un nouveau document."
+    },
+    "search": "Rechercher des documents...",
+    "noContent": "Pas encore de contenu"
+  },
+  "recent": {
+    "title": "Documents Récents",
+    "description": "Documents que vous avez récemment consultés ou modifiés.",
+    "empty": {
+      "title": "Aucun document récent",
+      "description": "Les documents que vous consultez ou modifiez apparaîtront ici."
+    }
+  },
+  "category": {
+    "title": "{{category}}",
+    "description": "Parcourez tous les {{category}} de votre bibliothèque.",
+    "empty": {
+      "title": "Aucun {{category}} trouvé",
+      "description": "Créez votre premier {{singular}} pour commencer."
+    }
+  },
+  "notFound": {
+    "title": "Page Non Trouvée",
+    "description": "La page que vous recherchez n'existe pas ou a été déplacée."
+  },
+  "filters": {
+    "allTime": "Toute la période",
+    "last7Days": "7 derniers jours",
+    "last30Days": "30 derniers jours",
+    "last90Days": "90 derniers jours",
+    "allCategories": "Toutes les Catégories",
+    "allStatuses": "Tous les Statuts",
+    "date": "Date",
+    "dateRange": "Période",
+    "startDate": "Date de début",
+    "endDate": "Date de fin",
+    "activeFilters": "Filtres actifs",
+    "search": "Recherche",
+    "clearAll": "Tout effacer",
+    "showing": "Affichage de",
+    "documents": "documents",
+    "document": "document",
+    "removeCategory": "Supprimer la catégorie",
+    "removeClient": "Supprimer le client",
+    "clientInUse": "Client utilisé dans les documents",
+    "hideClient": "Masquer le client",
+    "categoryInUse": "La catégorie par défaut ne peut pas être supprimée",
+    "errorDeletingClient": "Erreur lors de la suppression du client",
+    "clientNotFound": "Client introuvable ou vous n'avez pas la permission de le supprimer",
+    "clientInUseCannotDelete": "Ce client ne peut pas être supprimé car il est utilisé dans un ou plusieurs documents. Supprimez le client des documents avant de le supprimer.",
+    "clientDeleteFailed": "Échec de la suppression du client. Veuillez réessayer plus tard.",
+    "clientDeleteSuccess": "Client supprimé avec succès"
+  },
+  "templates": {
+    "manual": {
+      "title": "Manuel d'Opérations",
+      "intro": "Ce manuel décrit les procédures et directives pour les opérations et processus organisationnels.",
+      "section1": {
+        "title": "1. Introduction",
+        "content": "Ajoutez des informations d'introduction sur le manuel ici."
+      },
+      "section2": {
+        "title": "2. Procédures",
+        "content": "Décrivez les procédures principales :",
+        "item1": "Procédure 1",
+        "item2": "Procédure 2",
+        "item3": "Procédure 3"
+      },
+      "section3": {
+        "title": "3. Conclusion",
+        "content": "Ajoutez des informations finales et des considérations importantes ici."
+      }
+    },
+    "checklist": {
+      "title": "Liste de Contrôle",
+      "intro": "Utilisez cette liste de contrôle pour vous assurer que tous les éléments sont vérifiés et complétés de manière systématique.",
+      "section1": {
+        "title": "Éléments Principaux",
+        "item1": "Vérifier les exigences initiales",
+        "item2": "Confirmer la documentation nécessaire",
+        "item3": "Valider les informations de base",
+        "item4": "Examiner la conformité aux normes",
+        "item5": "Confirmer les approbations nécessaires"
+      },
+      "section2": {
+        "title": "Éléments Secondaires",
+        "item1": "Vérifier les détails supplémentaires",
+        "item2": "Confirmer la communication avec les parties prenantes",
+        "item3": "Valider les ressources disponibles"
+      },
+      "notes": {
+        "title": "Observations",
+        "content": "Ajoutez des observations supplémentaires, des notes importantes ou des exceptions identifiées lors de la vérification."
+      }
+    },
+    "guide": {
+      "title": "Guide de Référence Rapide",
+      "intro": "Ce guide fournit des informations rapides et pratiques sur les processus et procédures pour faciliter l'exécution des tâches.",
+      "overview": {
+        "title": "Vue d'Ensemble",
+        "content": "Ce guide présente un résumé des principaux concepts et processus liés au sujet, servant de référence rapide pour consultation."
+      },
+      "steps": {
+        "title": "Étapes Principales",
+        "step1": "Préparer l'environnement et les ressources nécessaires",
+        "step2": "Exécuter le processus principal tel que spécifié",
+        "step3": "Vérifier les résultats et valider la conformité",
+        "step4": "Documenter les conclusions et les prochaines actions"
+      },
+      "tips": {
+        "title": "Conseils Importants",
+        "tip1": "Maintenez toujours la documentation à jour",
+        "tip2": "Consultez les références avant de commencer",
+        "tip3": "Suivez l'ordre des étapes pour de meilleurs résultats",
+        "tip4": "En cas de doute, consultez le responsable"
+      },
+      "troubleshooting": {
+        "title": "Dépannage",
+        "content": "En cas de problèmes ou de difficultés, vérifiez les points ci-dessous :",
+        "item1": "Vérifier si tous les prérequis ont été satisfaits",
+        "item2": "Consulter la section des questions fréquemment posées (FAQ)"
+      }
+    },
+    "confidentiality": {
+      "title": "Accord de Confidentialité",
+      "intro": "Cet accord établit les conditions de confidentialité entre les parties impliquées, garantissant la protection des informations sensibles.",
+      "parties": {
+        "title": "Parties",
+        "disclosing": "Partie Divulgatrice",
+        "receiving": "Partie Réceptrice",
+        "companyName": "Nom de l'Entreprise",
+        "clientName": "Nom du Client"
+      },
+      "section1": {
+        "title": "1. Définitions",
+        "content": "Aux fins du présent accord, \"Informations Confidentielles\" signifie toutes les informations, données, documents et matériels fournis par la Partie Divulgatrice à la Partie Réceptrice.",
+        "detail": "Cela inclut, sans s'y limiter : les informations commerciales, techniques, financières, stratégiques, les listes de clients, les processus, les méthodes et toute autre information considérée comme confidentielle."
+      },
+      "section2": {
+        "title": "2. Obligations",
+        "content": "La Partie Réceptrice s'engage à :",
+        "item1": "Maintenir toutes les informations confidentielles absolument secrètes",
+        "item2": "Ne pas divulguer d'informations à des tiers sans autorisation préalable écrite",
+        "item3": "Utiliser les informations uniquement aux fins spécifiées dans cet accord",
+        "item4": "Prendre toutes les mesures raisonnables pour protéger les informations confidentielles"
+      },
+      "section3": {
+        "title": "3. Durée",
+        "content": "Cet accord reste en vigueur pour une période de [période] à compter de la date de signature.",
+        "detail": "Les obligations de confidentialité continueront d'être valables même après la fin de l'accord, comme spécifié."
+      },
+      "section4": {
+        "title": "4. Exceptions",
+        "content": "Les obligations de confidentialité ne s'appliquent pas aux informations qui : (a) étaient déjà publiquement connues ; (b) ont été développées indépendamment ; (c) ont été reçues de tiers sans restrictions ; ou (d) sont exigées par la loi."
+      },
+      "section5": {
+        "title": "5. Signatures",
+        "nameSignature": "Nom et Signature",
+        "date": "Date"
+      }
+    },
+    "proposal": {
+      "title": "Proposition Commerciale",
+      "intro": "Cette proposition a été spécialement développée pour répondre à vos besoins et objectifs, présentant une solution complète et personnalisée.",
+      "executive": {
+        "title": "Résumé Exécutif",
+        "content": "Cette proposition présente une solution complète et personnalisée pour répondre aux besoins spécifiques du client.",
+        "detail": "Notre objectif est de fournir des résultats exceptionnels qui dépassent les attentes et ajoutent une valeur significative à votre entreprise."
+      },
+      "section1": {
+        "title": "1. Compréhension du Problème",
+        "content": "Sur la base de notre analyse détaillée, nous avons identifié les défis suivants :",
+        "item1": "Défi lié à l'efficacité opérationnelle",
+        "item2": "Défi lié à l'évolutivité",
+        "item3": "Défi lié à la qualité",
+        "item4": "Défi lié aux coûts"
+      },
+      "section2": {
+        "title": "2. Solution Proposée",
+        "content": "Notre solution comprend les avantages suivants :",
+        "item1": "Augmentation de l'efficacité et de la productivité",
+        "item2": "Amélioration de la qualité des résultats",
+        "item3": "Réduction des coûts opérationnels",
+        "item4": "Évolutivité pour la croissance future",
+        "detail": "Notre approche est basée sur les meilleures pratiques du marché et l'expérience éprouvée dans des projets similaires."
+      },
+      "section3": {
+        "title": "3. Investissement",
+        "total": "Valeur Totale",
+        "amount": "[montant] €",
+        "payment": "Mode de Paiement",
+        "details": "détails",
+        "note": "Tous les montants incluent les taxes et peuvent être payés en plusieurs fois selon l'accord commercial."
+      },
+      "section4": {
+        "title": "4. Calendrier",
+        "intro": "Le projet sera exécuté en phases bien définies :",
+        "phase1": "Phase 1 : Planification et Préparation ([période])",
+        "phase2": "Phase 2 : Exécution et Mise en Œuvre ([période])",
+        "phase3": "Phase 3 : Livraison et Support ([période])"
+      },
+      "section5": {
+        "title": "5. Prochaines Étapes",
+        "content": "Pour démarrer ce projet, nous avons besoin de :",
+        "item1": "Approbation formelle de cette proposition",
+        "item2": "Signature du contrat",
+        "item3": "Planification de la réunion de lancement",
+        "closing": "Nous sommes disponibles pour clarifier toute question et démarrer ce projet dès que possible."
+      }
+    },
+    "contract": {
+      "title": "Contrat de Prestation de Services",
+      "parties": {
+        "title": "Parties Contractantes",
+        "contractor": "CONTRACTANT",
+        "contracted": "CONTRACTÉ",
+        "companyName": "Nom de l'Entreprise",
+        "clientName": "Nom du Client",
+        "cnpj": "inscrite au SIRET n°",
+        "cnpjNumber": "SIRET",
+        "document": "inscrit au SIRET/numéro n°",
+        "documentNumber": "document"
+      },
+      "section1": {
+        "title": "1. Objet du Contrat",
+        "content": "Le présent contrat a pour objet la prestation de services de [description des services], tel que spécifié dans ce document."
+      },
+      "section2": {
+        "title": "2. Délai d'Exécution",
+        "content": "Les services seront exécutés dans un délai de [période], à compter de la date de signature de ce contrat."
+      },
+      "section3": {
+        "title": "3. Valeur et Mode de Paiement",
+        "total": "Valeur Totale",
+        "amount": "[montant] €",
+        "payment": "Mode de Paiement",
+        "details": "détails"
+      },
+      "section4": {
+        "title": "4. Obligations du Contractant",
+        "item1": "Fournir toutes les informations et documents nécessaires à l'exécution des services",
+        "item2": "Effectuer les paiements conformément à l'accord et dans les délais établis"
+      },
+      "section5": {
+        "title": "5. Obligations du Contracté",
+        "item1": "Exécuter les services avec qualité et selon les spécifications convenues",
+        "item2": "Respecter les délais établis et communiquer tout retard à l'avance"
+      },
+      "section6": {
+        "title": "6. Résiliation",
+        "content": "Ce contrat peut être résilié par l'une ou l'autre des parties avec un préavis de [période], sans préjudice des obligations déjà assumées."
+      },
+      "section7": {
+        "title": "7. Juridiction",
+        "content": "La juridiction de [ville] est élue pour résoudre les questions découlant de ce contrat."
+      },
+      "section8": {
+        "title": "Signatures",
+        "contractor": "Nom et Signature - Contractant",
+        "contracted": "Nom et Signature - Contracté",
+        "date": "Date"
+      }
+    },
+    "policy": {
+      "title": "Politique",
+      "section1": {
+        "title": "1. Objectif",
+        "content": "Cette politique établit des directives et des normes pour [objectif de la politique], garantissant la cohérence et la conformité dans toute l'organisation."
+      },
+      "section2": {
+        "title": "2. Portée",
+        "content": "Cette politique s'applique à [à qui elle s'applique], y compris les employés, les partenaires et les tiers impliqués."
+      },
+      "section3": {
+        "title": "3. Directives",
+        "item1": "Directive 1",
+        "item2": "Directive 2",
+        "item3": "Directive 3"
+      },
+      "section4": {
+        "title": "4. Responsabilités",
+        "responsible": "Responsable",
+        "position": "poste/fonction",
+        "responsibilities": "Responsabilités",
+        "item1": "Responsabilité 1",
+        "item2": "Responsabilité 2"
+      },
+      "section5": {
+        "title": "5. Révision",
+        "content": "Cette politique sera révisée annuellement ou selon les besoins, garantissant sa mise à jour et sa pertinence."
+      },
+      "section6": {
+        "title": "6. Approbation",
+        "approved": "Approuvé le",
+        "signature": "Signature"
+      }
+    },
+    "procedure": {
+      "title": "Procédure Opérationnelle",
+      "section1": {
+        "title": "1. Objectif",
+        "content": "Cette procédure décrit le processus étape par étape pour [objectif de la procédure], garantissant la standardisation et la qualité."
+      },
+      "section2": {
+        "title": "2. Portée",
+        "content": "S'applique à [zone/processus spécifique] et doit être suivie par tous les intervenants."
+      },
+      "section3": {
+        "title": "3. Processus",
+        "subsection1": {
+          "title": "3.1. Étape Initiale",
+          "item1": "Première action à effectuer",
+          "item2": "Deuxième action à effectuer",
+          "item3": "Troisième action à effectuer"
+        },
+        "subsection2": {
+          "title": "3.2. Étapes Intermédiaires",
+          "item1": "Action intermédiaire 1",
+          "item2": "Action intermédiaire 2"
+        },
+        "subsection3": {
+          "title": "3.3. Étape Finale",
+          "item1": "Action finale 1",
+          "item2": "Action finale 2"
+        }
+      },
+      "section4": {
+        "title": "4. Responsables",
+        "execution": "Responsable de l'exécution",
+        "approval": "Responsable de l'approbation",
+        "namePosition": "nom/poste"
+      },
+      "section5": {
+        "title": "5. Documents Connexes",
+        "item1": "Document 1",
+        "item2": "Document 2"
+      }
+    }
+  }
+}
+

@@ -69,4 +69,8 @@ migrations/
 # Keep example files
 !.env.example
 
+# Agent rules and improvement guides (private files)
+COMO_PEDIR_MELHORIAS.md
+GUIA_MELHORIAS.md
+REGRAS_AGENTE.md
 
