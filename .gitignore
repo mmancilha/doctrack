@@ -47,6 +47,12 @@ Thumbs.db
 # Database
 *.db
 *.sqlite
+# Drizzle & Neon Specific
+.drizzle/
+drizzle.config.ts.local
+# Caso você use certificados SSL baixados para o Neon
+*.pem
+*.crt
 
 # Temporary files
 *.tmp
@@ -62,4 +68,5 @@ migrations/
 
 # Keep example files
 !.env.example
+
 
